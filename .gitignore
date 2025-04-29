@@ -1,0 +1,15 @@
+# caches
+.DS_Store
+__pycache__/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Python
+response_tools_py.egg-info/
+
+# data directories
+att-data/
+det-resp-data/
+eff-area-data/
+quantum-eff-data/
