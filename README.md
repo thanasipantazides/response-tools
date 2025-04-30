@@ -37,12 +37,16 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
+![Position 1 photon path](./assets/response-tools-py-figs/response-paths/Pos_1_CMOS_2_Response.png "Position 1 photon path")
+
 ### Position 2 (HXR, CdTe4)
 
 - **Thermal blanket:** ""
 - **Optics:** ""
 - **Filter:** ""
 - **Detector response:** ""
+
+![Position 2 photon path](./assets/response-tools-py-figs/response-paths/Pos_2_CdTe_4_Response.png "Position 2 photon path")
 
 ### Position 3 (HXR, CdTe2)
 
@@ -52,12 +56,16 @@ For a historical description of the response files below (old versions, etc.), s
 - **Pixelated attenuator:** ""
 - **Detector response:** ""
 
+![Position 3 photon path](./assets/response-tools-py-figs/response-paths/Pos_3_CdTe_2_Response.png "Position 3 photon path")
+
 ### Position 4 (HXR, CdTe3)
 
 - **Thermal blanket:** ""
 - **Optics:** ""
 - **Filter:** ""
 - **Detector response:** ""
+
+![Position 4 photon path](./assets/response-tools-py-figs/response-paths/Pos_4_CdTe_3_Response.png "Position 4 photon path")
 
 ### Position 5 (HXR, CdTe1)
 
@@ -66,6 +74,8 @@ For a historical description of the response files below (old versions, etc.), s
 - **Filter:** ""
 - **Pixelated attenuator:** ""
 - **Detector response:** ""
+
+![Position 5 photon path](./assets/response-tools-py-figs/response-paths/Pos_5_CdTe_1_Response.png "Position 5 photon path")
 
 ### Position 6 (Timepix)
 

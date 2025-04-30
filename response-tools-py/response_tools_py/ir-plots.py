@@ -120,7 +120,7 @@ def foxsi4_response_paths(save_assets=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.01, hspace=None)
 
     if save_assets:
-        plt.savefig(os.path.join(assets_dir,f"{title}.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(assets_dir,f"{title.replace(",", "").replace(".", "").replace(" ", "_")}.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
     ###########################################################################
@@ -217,7 +217,7 @@ def foxsi4_response_paths(save_assets=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.01, hspace=None)
 
     if save_assets:
-        plt.savefig(os.path.join(assets_dir,f"{title}.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(assets_dir,f"{title.replace(",", "").replace(".", "").replace(" ", "_")}.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
     ###########################################################################
@@ -297,7 +297,7 @@ def foxsi4_response_paths(save_assets=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.01, hspace=None)
     
     if save_assets:
-        plt.savefig(os.path.join(assets_dir,f"{title}.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(assets_dir,f"{title.replace(",", "").replace(".", "").replace(" ", "_")}.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 
@@ -401,7 +401,7 @@ def foxsi4_response_paths(save_assets=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.01, hspace=None)
     
     if save_assets:
-        plt.savefig(os.path.join(assets_dir,f"{title}.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(assets_dir,f"{title.replace(",", "").replace(".", "").replace(" ", "_")}.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 
@@ -518,7 +518,7 @@ def foxsi4_response_paths(save_assets=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.01, hspace=None)
     
     if save_assets:
-        plt.savefig(os.path.join(assets_dir,f"{title}.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(assets_dir,f"{title.replace(",", "").replace(".", "").replace(" ", "_")}.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 
@@ -635,8 +635,8 @@ def foxsi4_response_paths(save_assets=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.01, hspace=None)
     
     if save_assets:
-        plt.savefig(os.path.join(assets_dir,f"{title}.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(assets_dir,f"{title.replace(",", "").replace(".", "").replace(" ", "_")}.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 if __name__=="__main__":
-    foxsi4_response_paths(save_assets=False)
+    foxsi4_response_paths(save_assets=True)
