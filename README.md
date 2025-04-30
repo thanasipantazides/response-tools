@@ -26,7 +26,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
-![Position 0 photon path](./assets/response-tools-py-figs/response-paths/Pos. 0, CMOS 1 Response.png "Position 0 photon path")
+![Position 0 photon path](./assets/response-tools-py-figs/response-paths/Pos_0_CMOS_1_Response.png "Position 0 photon path")
 
 ### Position 1 (SXR, CMOS2)
 
