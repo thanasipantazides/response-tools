@@ -26,6 +26,8 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
+![Position 0 photon path](./assets/response-tools-py-figs/response-paths/Pos. 0, CMOS 1 Response.png "Position 0 photon path")
+
 ### Position 1 (SXR, CMOS2)
 
 - **Optical blocking filter:** `"foxsi4_telescope-1_BASIC_optical_blocking_filter_transmittance_v1.fits"`
