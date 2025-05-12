@@ -21,7 +21,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Optical blocking filter:** `"foxsi4_telescope-0_BASIC_optical_blocking_filter_transmittance_v1.fits"`
   - _Description:_
 - **Collimator:** `"foxsi4_telescope-0_BASIC_collimator_aperture_ratio_v1.fits"`
-- **Optics:** ""
+- **Optics:** `""`
 - **Filter:** `"foxsi4_telescope-0_BASIC_attenuation_filter_transmittance_v1.fits"`
 - **Detector response:** ""
   - **Quantum efficiency:** ""
