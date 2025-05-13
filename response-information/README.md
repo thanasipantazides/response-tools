@@ -74,7 +74,7 @@ When a newer version of a file comes along, the text describing any old file can
   - _Version description:_
 - **Filter:** `"unif_att_p2_theoretical_v1.csv"` (Al 0.015")
   - _Original file:_ `"unif_att_p2_theoretical.csv"`
-  - _Origin:_ In the Google Drive `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Uniform attenuators (theoretical)`
+  - _Origin:_ In the Google Drive `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Uniform attenuators (theoretical)`
   - _Version description:_
 - **Detector response:** ""
 
@@ -86,15 +86,15 @@ When a newer version of a file comes along, the text describing any old file can
   - _Version description:_
 - **Optics:** `"FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt"` (Marshall 2-shell X09/FM2)
   - _Original file:_ `"FOXSI4_Effective_Areas_2025April11.txt"`[*](../response-tools-py/response_tools_py/aux)
-  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Optics`>`msfc-hi-res`>`model-data-comparison`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Optics`>`msfc-hi-res`>`model-data-comparison`
   - _Version description:_
 - **Filter:** `"thin_mylar_p3_p5_theoretical_v1.csv"`
   - _Original file:_ `"thin_mylar_p3_p5_theoretical.csv"`
-  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Aluminized mylar detector window`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Aluminized mylar detector window`
   - _Version description:_
 - **Pixelated attenuator:** `"20240607_fosxi4_transmission_v1.csv"`
   - _Original file:_ `"20240607_fosxi4_transmission.csv"`
-  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Attenuator data analysis`>`gsfc_foxsi_attenuator_analysis`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Attenuator data analysis`>`gsfc_foxsi_attenuator_analysis`
   - _Version description:_
 - **Detector response:** ""
 
@@ -107,7 +107,7 @@ When a newer version of a file comes along, the text describing any old file can
 - **Optics:** "" (Nagoya 1-shell HXT)
 - **Filter:** `"unif_att_p4_theoretical_v1.csv"` (Al 0.015")
   - _Original file:_ `"unif_att_p4_theoretical.csv"`
-  - _Origin:_ In the Google Drive `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Uniform attenuators (theoretical)`
+  - _Origin:_ In the Google Drive `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Uniform attenuators (theoretical)`
 - **Detector response:** ""
 
 ### Position 5 (HXR, CdTe1)
@@ -122,11 +122,11 @@ When a newer version of a file comes along, the text describing any old file can
   - _Version description:_
 - **Filter:** `"thin_mylar_p3_p5_theoretical_v1.csv"`
   - _Original file:_ `"thin_mylar_p3_p5_theoretical.csv"`
-  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Aluminized mylar detector window`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Aluminized mylar detector window`
   - _Version description:_
 - **Pixelated attenuator:** `"20240607_fosxi4_transmission_v1.csv"`
   - _Original file:_ `"20240607_fosxi4_transmission.csv"`
-  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370>``Flight Science`>`Response Work`>`Attenuator data analysis`>`gsfc_foxsi_attenuator_analysis`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Attenuator data analysis`>`gsfc_foxsi_attenuator_analysis`
   - _Version description:_
 - **Detector response:** ""
 
