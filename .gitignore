@@ -9,7 +9,7 @@ __pycache__/
 response_tools_py.egg-info/
 
 # data directories
-att-data/
-det-resp-data/
-eff-area-data/
-quantum-eff-data/
+response-information/attenuation-data/
+response-information/detector-response-data/
+response-information/effective-area-data/
+response-information/quantum-efficiency-data/

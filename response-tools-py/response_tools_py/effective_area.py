@@ -38,7 +38,7 @@ def eff_area_msfc_10shell(mid_energies, off_axis=0, file_tilt=None, file_pan=Non
     return i(mid_energies, off_axis) << u.cm**2
 
 def _get_ea_file_info(optics_id, axis, file=None):
-    _f = os.path.join(EFF_PATH, f"FOXSI3_Module_{optics_id}_EA_{axis}.txt") if file is None else file
+    _f = os.path.join(EFF_PATH, f"FOXSI3_Module_{optics_id}_EA_{axis}_v1.txt") if file is None else file
     return np.loadtxt(_f, delimiter=",")
 
 def _get_oa_and_ea_msfc_10shell(grid):
@@ -58,12 +58,10 @@ def eff_area_msfc_hi_res(mid_energies, file=None, position=None, use_model=False
     Position 6: X11/FM3
     """
     # msfc_hi_res effective areas
-    if use_model:
-        _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_v1.txt") if file is None else file
-        e, fm1, fm2, fm3 = np.loadtxt(_f).T
-    else:
-        _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_with models_v1.txt") if file is None else file
-        e, _, _, _, fm1, fm2, fm3 = np.loadtxt(_f).T
+    _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt") if file is None else file
+    e, f1, f2, f3, f1_m, f2_m, f3_m = np.loadtxt(_f).T
+
+    fm1, fm2, fm3 = (f1_m, f2_m, f3_m) if use_model else (f1, f2, f3)
 
     e <<= u.keV
     fm1 <<= u.cm**2
@@ -80,9 +78,10 @@ def eff_area_msfc_hi_res(mid_energies, file=None, position=None, use_model=False
 
 @u.quantity_input(mid_energies=u.keV)
 def eff_area_msfc(mid_energies, file=None):
-    """Return MSCF hi-res effective areas interpolated to the given energies."""
+    """Return early MSCF hi-res effective areas interpolated to the given energies."""
     # msfc_hi_res effective areas
-    logging.warning("This might not be the function you are looking for, please see `eff_area_msfc_hi_res`.")
+    logging.warning("Caution: This might not be the function you are looking for, please see `eff_area_msfc_hi_res`.")
+    logging.warning("This current function loads in some very early numbers for the new FOXSI-4 MSFC optics.")
     _f = os.path.join(EFF_PATH, "3Inner_EA_EPDL97_14AA.csv") if file is None else file
     msfc_hi_res = pandas.read_csv(_f).to_numpy()[:,1:] # remove the first column that only indexes
     # in cm2 ; we use the innermost and the 3rd innermost shells (S10 and S08) [from Yixian]
@@ -111,7 +110,7 @@ def eff_area_cmos(mid_energies, file=None, telescope=None):
         logging.warning("`telescope` input in `eff_area_cmos()` must be 0 or 1.")
         return
         
-    _f = os.path.join(EFF_PATH, f"foxsi4_telescope-{telescope}_BASIC_mirror_effective_area_V25APR13.fits") if file is None else file
+    _f = os.path.join(EFF_PATH, f"foxsi4_telescope-{telescope}_BASIC_mirror_effective_area_v1.fits") if file is None else file
     with fits.open(_f) as hdul:
         es, effas = hdul[2].data << u.keV, hdul[1].data << u.cm**2
     return np.interp(mid_energies.value, es.value, effas.value, left=0, right=0) << u.cm**2
@@ -131,7 +130,12 @@ def eff_area_cmos_telescope(mid_energies, file=None, telescope=None):
     if telescope is None:
         logging.warning("`telescope` input in `eff_area_cmos_telescope()` must be 0 or 1.")
         return
-        
+    
+    # not tracking this combined response product
+    logging.warning("Caution: This output will include a combined response from various elements.")
+    logging.warning("If you care about what elements are included then proceed carefully.")
+    logging.warning("For current file, see PR#11 in the `cmos-tools` repository.")
+
     _f = os.path.join(EFF_PATH, f"foxsi4_telescope-{telescope}_BASIC_TELESCOPE_RESPONSE_V25APR13.fits") if file is None else file
     with fits.open(_f) as hdul:
         # _ is the off-axis angle but it's just [0] at the minute
@@ -284,19 +288,25 @@ if __name__=="__main__":
         gsax.set_ylim([0, np.nanmax(eff_area_msfc_10shell(ea_energies, off_axis=0<<u.arcmin, optic_id=optic)).value*1.01])
 
     gs_ax5 = fig.add_subplot(gs[2, 1])
-    _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_v1.txt")
+    _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt")
     e, *_ = np.loadtxt(_f).T
     e <<= u.keV
     msfc_hi_res_p0 = eff_area_msfc_hi_res(e, position=0)
     msfc_hi_res_p3 = eff_area_msfc_hi_res(e, position=3)
     msfc_hi_res_p6 = eff_area_msfc_hi_res(e, position=6)
-    p1 = gs_ax5.plot(e, msfc_hi_res_p0, label="Pos. 0 (X10/FM2)")
-    p2 = gs_ax5.plot(e, msfc_hi_res_p3, label="Pos. 3 (X09/FM1)")
-    p3 = gs_ax5.plot(e, msfc_hi_res_p6, label="Pos. 6 (X11/FM3)")
+    msfc_hi_res_p0m = eff_area_msfc_hi_res(e, position=0, use_model=True)
+    msfc_hi_res_p3m = eff_area_msfc_hi_res(e, position=3, use_model=True)
+    msfc_hi_res_p6m = eff_area_msfc_hi_res(e, position=6, use_model=True)
+    p10 = gs_ax5.plot(e, msfc_hi_res_p0, label="Pos. 0 (X10/FM2)")
+    p20 = gs_ax5.plot(e, msfc_hi_res_p3, label="Pos. 3 (X09/FM1)")
+    p30 = gs_ax5.plot(e, msfc_hi_res_p6, label="Pos. 6 (X11/FM3)")
+    p11 = gs_ax5.plot(e, msfc_hi_res_p0m, label="Pos. 0 (X10/FM2, model)")
+    p21 = gs_ax5.plot(e, msfc_hi_res_p3m, label="Pos. 3 (X09/FM1, model)")
+    p31 = gs_ax5.plot(e, msfc_hi_res_p6m, label="Pos. 6 (X11/FM3, model)")
     gs_ax5.set_title("MSFC High-res.")
     gs_ax5.set_xlabel(f"Energy {e.unit:latex}")
     gs_ax5.set_ylabel(f"Eff. Area {msfc_hi_res_p0.unit:latex}")
-    plt.legend(handles=p1+p2+p3)
+    plt.legend(handles=p10+p11+p20+p21+p30+p31, fontsize=6)
 
     gs_ax5.set_xlim([e[0].value, e[-1].value])
 

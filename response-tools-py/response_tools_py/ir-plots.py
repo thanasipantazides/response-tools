@@ -8,21 +8,21 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 
-from att import (att_thermal_blanket, 
-                    att_uniform_al_cdte, 
-                    att_pixelated, 
-                    att_al_mylar,
-                    att_cmos_obfilter,
-                    att_cmos_collimator_ratio,
-                    att_cmos_filter,)
-from det_resp import (cdte_det_resp_rmf, 
-                        cmos_det_resp,
-                        DET_RESP_PATH,)
-from eff_area import (eff_area_msfc_10shell, 
-                        eff_area_msfc_hi_res,
-                        eff_area_cmos,)
+from attenuation import (att_thermal_blanket, 
+                         att_uniform_al_cdte, 
+                         att_pixelated, 
+                         att_al_mylar,
+                         att_cmos_obfilter,
+                         att_cmos_collimator_ratio,
+                         att_cmos_filter,)
+from detector_response import (cdte_det_resp_rmf, 
+                               cmos_det_resp,
+                               DET_RESP_PATH,)
+from effective_area import (eff_area_msfc_10shell, 
+                            eff_area_msfc_hi_res,
+                            eff_area_cmos,)
 from phot_spec import zeroes2nans
-from quantum_eff import qe_cmos
+from quantum_efficiency import qe_cmos
 
 def foxsi4_response_paths(save_assets=False):
     

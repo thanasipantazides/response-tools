@@ -21,7 +21,7 @@ def qe_cmos(mid_energies, file=None, telescope=None):
         logging.warning("`telescope` input in `qe_cmos()` must be 0 or 1.")
         return
         
-    _f = os.path.join(Q_PATH, f"foxsi4_telescope-{telescope}_BASIC_sensor_quantum_efficiency_V25APR13.fits") if file is None else file
+    _f = os.path.join(Q_PATH, f"foxsi4_telescope-{telescope}_BASIC_sensor_quantum_efficiency_v1.fits") if file is None else file
     with fits.open(_f) as hdul:
         es, qe = hdul[2].data << u.keV, hdul[1].data << u.dimensionless_unscaled
     return np.interp(mid_energies.value, es.value, qe.value, left=0, right=0) << u.dimensionless_unscaled

@@ -42,7 +42,7 @@ For a historical description of the response files below (old versions, etc.), s
 ### Position 2 (HXR, CdTe4)
 
 - **Thermal blanket:** ""
-- **Optics:** ""
+- **Optics:** `"FOXSI3_Module_X-7_EA_pan_v1.txt"`
 - **Filter:** ""
 - **Detector response:** ""
 
