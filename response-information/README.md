@@ -104,7 +104,10 @@ When a newer version of a file comes along, the text describing any old file can
   - _Original file:_ `"F4_Blanket_transmission.dat"`
   - _Origin:_ Uses [see Morgan]
   - _Version description:_
-- **Optics:** "" (Nagoya 1-shell HXT)
+- **Optics:** `"nagoya_hxt_onaxis_measurement_v1.txt"` (Nagoya 1-shell HXT)
+  - _Original file:_ `"gain-corrrection_focused_incident_0.0207951x-plus--0.0552269_to_0.0207959x-plus--0.0492531_grpmin1000_Be_focused300.0s_incident300.0s_plot.txt"`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Optics`>`Nagoya_optics`>`on-axis_effective_area_measurement`>`HXR`>`on-axis_EA`
+  - _Version description:_ HXR on-axis.
 - **Filter:** `"unif_att_p4_theoretical_v1.csv"` (Al 0.015")
   - _Original file:_ `"unif_att_p4_theoretical.csv"`
   - _Origin:_ In the Google Drive `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Uniform attenuators (theoretical)`
@@ -153,3 +156,7 @@ These files are:
   - Early MSCF hi-res effective areas used in pre-launch simulations.
 - `"effective-area_raytracing_soft-xray-optic_on-axis.txt"`
   - Early Nagoya SXR hi-res effective areas used in pre-launch simulations.
+- **Optics:** `"nagoya_sxt_onaxis_measurement_v1.txt"` (Nagoya 1-shell HXT)
+  - _Original file:_ `"focused_incident_grpmin1000_C1_focused1800.0s_incident1800.0s_plot.txt"`
+  - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Optics`>`Nagoya_optics`>`on-axis_effective_area_measurement`>`SXR`>`on-axis_EA`
+  - _Version description:_ SXR on-axis.
