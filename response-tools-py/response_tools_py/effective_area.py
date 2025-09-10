@@ -12,7 +12,7 @@ import numpy as np
 from scipy.interpolate import CloughTocher2DInterpolator, LinearNDInterpolator 
 import pandas
 
-from util import native_resolution
+from response_tools_py.util import native_resolution
 
 EFF_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "effective-area-data")
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "eff-area-figs")
@@ -115,25 +115,40 @@ def eff_area_nagoya(mid_energies, file=None):
     return mid_energies, np.interp(mid_energies.value, nagoya_sxr_es.value, nagoya_sxr_effa.value, left=0, right=0) << u.cm**2
 
 @u.quantity_input(mid_energies=u.keV)
-def eff_area_nagoya_hxt(mid_energies, file=None):
+def eff_area_nagoya_hxt(mid_energies, file=None, use_model=False):
     """Return Nagoya HXR hi-res effective areas (measured) interpolated to the given energies."""
-    # nagoya sxr effective areas
-    _f = os.path.join(EFF_PATH, "nagoya_hxt_onaxis_measurement_v1.txt") if file is None else file
-    nagoya_sxr = np.loadtxt(_f)
-    # energy, energy_err, area, area_err
-    nagoya_sxr_es, _, nagoya_sxr_effa, _ = nagoya_sxr[:,0] << u.keV, nagoya_sxr[:,1] << u.keV, nagoya_sxr[:,2] << u.cm**2, nagoya_sxr[:,3] << u.cm**2
+    # nagoya hxr effective areas
+    if not use_model:
+        _f = os.path.join(EFF_PATH, "nagoya_hxt_onaxis_measurement_v1.txt") if file is None else file
+        nagoya_hxr = np.loadtxt(_f)
+        nagoya_hxr_es, _, nagoya_hxr_effa, _ = nagoya_hxr[:,0] << u.keV, nagoya_hxr[:,1] << u.keV, nagoya_hxr[:,2] << u.mm**2, nagoya_hxr[:,3] << u.mm**2
+        nagoya_hxr_effa = nagoya_hxr_effa << u.cm**2
+    else:
+        _f = os.path.join(EFF_PATH, "HXR_Nagoya_FOXSI4.arf") if file is None else file
+        with fits.open(_f) as hdul:
+            nagoya_hxr_es = (hdul[1].data["ENERG_LO"]+hdul[1].data["ENERG_HI"])/2 << u.keV
+            nagoya_hxr_effa = hdul[1].data["SPECRESP"] << u.cm**2
     
-    mid_energies = native_resolution(native_x=nagoya_sxr_es, input_x=mid_energies)
-    return mid_energies, np.interp(mid_energies.value, nagoya_sxr_es.value, nagoya_sxr_effa.value, left=0, right=0) << u.cm**2
+    mid_energies = native_resolution(native_x=nagoya_hxr_es, input_x=mid_energies)
+    return mid_energies, np.interp(mid_energies.value, nagoya_hxr_es.value, nagoya_hxr_effa.value, left=0, right=0) << u.cm**2
 
 @u.quantity_input(mid_energies=u.keV)
-def eff_area_nagoya_sxt(mid_energies, file=None):
-    """Return Nagoya SXR hi-res effective areas (measured) interpolated to the given energies."""
+def eff_area_nagoya_sxt(mid_energies, file=None, use_model=False):
+    """Return Nagoya SXR hi-res effective areas (measured) interpolated to the given energies.
+    
+    Includes the collimator and OBF too.
+    """
     # nagoya sxr effective areas
-    _f = os.path.join(EFF_PATH, "nagoya_sxt_onaxis_measurement_v1.txt") if file is None else file
-    nagoya_sxr = np.loadtxt(_f)
-    # energy, energy_err, area, area_err
-    nagoya_sxr_es, _, nagoya_sxr_effa, _ = nagoya_sxr[:,0] << u.keV, nagoya_sxr[:,1] << u.keV, nagoya_sxr[:,2] << u.cm**2, nagoya_sxr[:,3] << u.cm**2
+    if not use_model:
+        _f = os.path.join(EFF_PATH, "nagoya_sxt_onaxis_measurement_v1.txt") if file is None else file
+        nagoya_sxr = np.loadtxt(_f)
+        nagoya_sxr_es, _, nagoya_sxr_effa, _ = nagoya_sxr[:,0] << u.keV, nagoya_sxr[:,1] << u.keV, nagoya_sxr[:,2] << u.mm**2, nagoya_sxr[:,3] << u.mm**2
+        nagoya_sxr_effa = nagoya_sxr_effa << u.cm**2
+    else:
+        _f = os.path.join(EFF_PATH, "SXR_nocollimator_noobf.arf") if file is None else file
+        with fits.open(_f) as hdul:
+            nagoya_sxr_es = (hdul[1].data["ENERG_LO"]+hdul[1].data["ENERG_HI"])/2 << u.keV
+            nagoya_sxr_effa = hdul[1].data["SPECRESP"] << u.cm**2
     
     mid_energies = native_resolution(native_x=nagoya_sxr_es, input_x=mid_energies)
     return mid_energies, np.interp(mid_energies.value, nagoya_sxr_es.value, nagoya_sxr_effa.value, left=0, right=0) << u.cm**2
@@ -225,7 +240,7 @@ def asset_cmos_plot(save_asset=False):
         plt.savefig(os.path.join(ASSETS_PATH,"cmos-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_cmos_sxr(save_asset=False):
+def asset_cmos_files(save_asset=False):
     """Plot the CMOS data to visually check."""
     mid_energies = np.linspace(0, 20, 1000)<<u.keV
     
@@ -234,15 +249,38 @@ def asset_cmos_sxr(save_asset=False):
     gs = gridspec.GridSpec(1, 2)
 
     gs_ax0 = fig.add_subplot(gs[0, 0])
-    _, a1 = eff_area_cmos(mid_energies, file=None, telescope=1)
-    _, nag = eff_area_nagoya_sxt(mid_energies)
-    gs_ax0.plot(mid_energies, a1, label="CMOS telescope 1, position 1")
-    gs_ax0.plot(mid_energies, nag, label="Nagoya (meas.) position 1")
-    gs_ax0.set_title("CMOS SXR Optics")
-    gs_ax0.set_ylabel(f"Effective Area [{a1.unit:latex}]")
+    _, a0 = eff_area_cmos(mid_energies, file=None, telescope=0)
+    _, msfc_hi_res_p0 = eff_area_msfc_hi_res(mid_energies, position=0)
+    _, msfc_hi_res_p0m = eff_area_msfc_hi_res(mid_energies, position=0, use_model=True)
+    gs_ax0.plot(mid_energies, a0, label="CMOS telescope 0, position 0")
+    gs_ax0.plot(mid_energies, msfc_hi_res_p0, label="MSFC (meas.), position 0")
+    gs_ax0.plot(mid_energies, msfc_hi_res_p0m, label="MSFC (mod.), position 0")
+    gs_ax0.set_title("CMOS SXR Optics: Position 0")
+    gs_ax0.set_ylabel(f"Effective Area [{a0.unit:latex}]")
     gs_ax0.set_xlabel(f"Energy [{mid_energies.unit:latex}]")
     plt.legend()
     plt.yscale("log")
+
+    from attenuation import att_cmos_obfilter, att_cmos_collimator_ratio
+
+    gs_ax1 = fig.add_subplot(gs[0, 1])
+    _, a1 = eff_area_cmos(mid_energies, file=None, telescope=1)
+    _, nag_sxt = eff_area_nagoya_sxt(mid_energies)
+    gs_ax1.plot(mid_energies, a1*att_cmos_obfilter(mid_energies, telescope=1)*att_cmos_collimator_ratio(0<<u.arcmin, telescope=1), label="CMOS telescope 1*collimator*obf, position 1")
+    gs_ax1.plot(mid_energies, nag_sxt, label="Nagoya SXT (meas.) position 1")
+    # gs_ax1.plot(mid_energies, a1, label="CMOS telescope 1, position 1")
+    # gs_ax1.plot(mid_energies, nag_sxt/att_cmos_obfilter(mid_energies, telescope=1)/att_cmos_collimator_ratio(0<<u.arcmin, telescope=1), label="Nagoya SXT (meas.)/collimator/OBF, position 1")
+    gs_ax1.set_title("CMOS SXR Optics: Position 1")
+    gs_ax1.set_ylabel(f"Effective Area [{a1.unit:latex}]")
+    gs_ax1.set_xlabel(f"Energy [{mid_energies.unit:latex}]")
+    plt.legend()
+    # plt.yscale("log")
+    plt.ylim([0,0.35])
+
+    plt.xlim([0,20])
+
+    # print(a1)
+    print(att_cmos_collimator_ratio(0<<u.arcmin, telescope=0), 1/att_cmos_collimator_ratio(0<<u.arcmin, telescope=0))
 
     plt.tight_layout()
     if save_asset:
@@ -380,9 +418,9 @@ def asset_all_optics(save_asset=False):
     native_es_on, old_vals = eff_area_nagoya(for_native_res, file=None)
     native_es_cmos, cmos_vals = eff_area_cmos(for_native_res, file=None, telescope=1)
     native_es_nag, nag_vals = eff_area_nagoya_sxt(for_native_res, file=None)
-    p1 = gs_ax6.plot(native_es_on, old_vals, label="Old SXR Nagoya")
+    p1 = gs_ax6.plot(native_es_on, old_vals, label="Old SXR Nagoya (might inc. coll. &| OBF)")
     p2 = gs_ax6.plot(native_es_cmos, cmos_vals, label="CMOS SXR Nagoya")
-    p3 = gs_ax6.plot(native_es_nag, nag_vals, label="SXR Nagoya")
+    p3 = gs_ax6.plot(native_es_nag, nag_vals, label="SXR Nagoya (inc. coll. & OBF)")
     gs_ax6.set_title("Nagoya SXR")
     gs_ax6.set_xlabel(f"Energy {e.unit:latex}")
     gs_ax6.set_ylabel(f"Eff. Area {msfc_hi_res_p0.unit:latex}")
@@ -390,16 +428,12 @@ def asset_all_optics(save_asset=False):
 
     gs_ax6 = fig.add_subplot(gs[2, 2])
     for_native_res = np.nan << u.keV
-    native_es_on, old_vals = eff_area_nagoya(for_native_res, file=None)
-    native_es_cmos, cmos_vals = eff_area_cmos(for_native_res, file=None, telescope=0)
     native_es_nag, nag_vals = eff_area_nagoya_hxt(for_native_res, file=None)
-    p1 = gs_ax6.plot(native_es_on, old_vals, label="Old SXR Nagoya")
-    p2 = gs_ax6.plot(native_es_cmos, cmos_vals, label="CMOS HXR Nagoya")
-    p3 = gs_ax6.plot(native_es_nag, nag_vals, label="HXR Nagoya")
-    gs_ax6.set_title("Nagoya SXR")
+    p1 = gs_ax6.plot(native_es_nag, nag_vals, label="HXR Nagoya")
+    gs_ax6.set_title("Nagoya HXR")
     gs_ax6.set_xlabel(f"Energy {e.unit:latex}")
     gs_ax6.set_ylabel(f"Eff. Area {msfc_hi_res_p0.unit:latex}")
-    plt.legend(handles=p1+p2+p3, fontsize=6)
+    plt.legend(handles=p1, fontsize=6)
 
     plt.tight_layout()
     if save_asset:
@@ -410,10 +444,10 @@ def asset_all_optics(save_asset=False):
 if __name__=="__main__":
     s = np.array([np.nan, np.nan])<<u.keV
     s = np.nan<<u.keV
-    print(s, np.all(np.isnan(s)))
+    # print(s, np.all(np.isnan(s)))
     eff_area_nagoya_hxt(s, file=None)
     save_asset = False
     # asset_cmos_plot(save_asset=save_asset)
-    asset_cmos_sxr(save_asset=save_asset)
-    # asset_all_optics(save_asset=save_asset)
+    asset_cmos_files(save_asset=save_asset)
+    asset_all_optics(save_asset=save_asset)
     

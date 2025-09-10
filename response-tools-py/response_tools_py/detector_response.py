@@ -33,7 +33,7 @@ def cmos_det_resp(file=None, telescope=None):
         
     _f = os.path.join(DET_RESP_PATH, 
                       "cmos", 
-                      f"foxsi4_telescope-{telescope}_BASIC_RESPONSE_MATRIX_V25APR13.fits") if file is None else file
+                      f"foxsi4_telescope-{telescope}_BASIC_RESPONSE_MATRIX_v1.fits") if file is None else file
     
     with fits.open(_f) as hdul:
         matrix, counts, energy = hdul[1].data<<(u.ct/u.ph), hdul[2].data<<u.dimensionless_unscaled, hdul[3].data<<u.keV # units?
