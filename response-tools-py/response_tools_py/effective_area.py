@@ -29,7 +29,7 @@ def eff_area_msfc_10shell(mid_energies, off_axis=0, file_tilt=None, file_pan=Non
     vals_tilt = _get_ea_file_info(_id, "tilt", file=file_tilt)
     vals_pan = _get_ea_file_info(_id, "pan", file=file_pan)
 
-    # from Milo on 17/3/2025 @ 13:47 (Slack)
+    # from Milo to Kris on 17/3/2025 @ 13:47 (Slack)
     ea_energies = [4.5,  5.5,  6.5,  7.5,  8.5,  9.5, 11. , 13. , 15. , 17. , 19. , 22.5, 27.5] << u.keV
 
     off_axis_angles_tilt, eff_areas_tilt = _get_oa_and_ea_msfc_10shell(vals_tilt)
@@ -268,8 +268,6 @@ def asset_cmos_files(save_asset=False):
     _, nag_sxt = eff_area_nagoya_sxt(mid_energies)
     gs_ax1.plot(mid_energies, a1*att_cmos_obfilter(mid_energies, telescope=1)*att_cmos_collimator_ratio(0<<u.arcmin, telescope=1), label="CMOS telescope 1*collimator*obf, position 1")
     gs_ax1.plot(mid_energies, nag_sxt, label="Nagoya SXT (meas.) position 1")
-    # gs_ax1.plot(mid_energies, a1, label="CMOS telescope 1, position 1")
-    # gs_ax1.plot(mid_energies, nag_sxt/att_cmos_obfilter(mid_energies, telescope=1)/att_cmos_collimator_ratio(0<<u.arcmin, telescope=1), label="Nagoya SXT (meas.)/collimator/OBF, position 1")
     gs_ax1.set_title("CMOS SXR Optics: Position 1")
     gs_ax1.set_ylabel(f"Effective Area [{a1.unit:latex}]")
     gs_ax1.set_xlabel(f"Energy [{mid_energies.unit:latex}]")

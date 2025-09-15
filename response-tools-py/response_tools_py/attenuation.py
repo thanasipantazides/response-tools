@@ -3,6 +3,8 @@
 import logging
 import os
 import pathlib
+import sys
+import warnings
 
 from astropy.io import fits
 import astropy.units as u
@@ -10,7 +12,11 @@ import numpy as np
 import pandas
 import scipy
 
+from response_tools_py.util import native_resolution
+
 ATT_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "attenuation-data")
+ATM_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "atmospheric-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "att-figs")
 
 # thermal blanket attenuation
 @u.quantity_input(mid_energies=u.keV)
@@ -126,15 +132,92 @@ def att_cmos_collimator_ratio(off_axis_angle, file=None, telescope=None):
         oa_angles, aperture_ratio = hdul[2].data << u.arcsec, hdul[1].data << u.dimensionless_unscaled
     return np.interp(off_axis_angle.value, oa_angles.value, aperture_ratio.value, left=0, right=0) << u.dimensionless_unscaled
 
-if __name__=="__main__":
-    import matplotlib.pyplot as plt
+@u.quantity_input(mid_energies=u.keV, time=u.second)
+def att_atmosphere(mid_energies, time_range=None, file=None):
+    """ 
+    Atmsopheric attenuation from and for FOXSI-4 flight data.
 
-    from phot_spec import create_energy_midpoints, zeroes2nans
+    energy = array containing energy in keV for energies 0.01 - 30 keV. Array has 506 elements
+		 
+    atmospheric_trans = array containing transmission for all energy values in energy array.
+                        Transmission is calculated for 10284 times covering the FOXSI-4 flight. 
+                        Array shape is: [10284,506] which corresponds to transmission for [time,energy]
+                        
+                        Launch time t = 0 corresponds to  index [0,*] 
+                        Observation starts at t = 100s corresponds to index [2000,*]
+                        Approximate middle of observation at t = 280s corresponds to index [5600,*]
+                        End of observation at t = 461s corresponds to index [9200,*] 
 
-    SAVE_ASSETS = False
-    assets_dir = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "att-figs")
-    pathlib.Path(assets_dir).mkdir(parents=True, exist_ok=True)
 
+    Units in the FITS header needs to change from keV->eV
+    Need an array of times included
+    -> 10,284 entries and t=0 is index `0` while t=100 is index `2000`
+    -> final time is 100/2000 * 10284 = 514.2
+
+    Parameters
+    ----------
+    mid_energies 
+
+    time_range
+    
+    file: `str` or `None`
+    """
+    if (time_range is None) or np.all(np.isnan(time_range)):
+        time_range = [np.nan, np.nan] << u.second
+    
+    if (len(time_range)!=2):
+        warnings.warn(f"{sys._getframe().f_code.co_name} `time_range` (convertable to astropy.units.seconds) should be of length 2.")
+        return
+
+    _f = os.path.join(ATM_PATH, f"FOXSI4_atmospheric_transmission_v1.fits") if file is None else file
+    with fits.open(_f) as hdul:
+        native_energies, transmission = (hdul[1].data[0][0]<<u.eV)<<u.keV, hdul[1].data[0][1]<<u.dimensionless_unscaled
+        # Need an array of times included
+        # -> 10,284 entries and t=0 is index `0` while t=100 is index `2000`
+        # -> final time is 100/2000 * 10284 = 514.2
+        native_times = np.linspace(0, 514.2, 10_284)<<u.second
+
+        # assume some sort of uniform uniform binning
+        en_res = np.mean(np.diff(native_energies))
+
+    # if the time range is nothing them just want all the times, deal with energies separately
+    if np.all(np.isnan(time_range)):
+        if np.all(np.isnan(mid_energies)):
+            # don't bother going further if we're just going to return the native data
+            return native_energies<<u.keV, native_times, transmission
+        
+        # the grid can be huge so let's help cut down on the interpolation amount
+        cut_native_energies_inds = np.nonzero(((mid_energies[0]-en_res)<=native_energies) & (native_energies<=(mid_energies[-1]+en_res)))
+        cut_native_energies = native_energies[cut_native_energies_inds]
+        cut_transmission = transmission[cut_native_energies_inds]
+
+        x, y = np.meshgrid(cut_native_energies, native_times)
+        i = scipy.interpolate.LinearNDInterpolator(list(zip(x.flatten().value, y.flatten().value)), cut_transmission.T.flatten().value)
+
+        mid_energies = native_resolution(native_x=native_energies, input_x=mid_energies)
+        all_times = native_resolution(native_x=native_times, input_x=time_range)
+        X, Y = np.meshgrid(mid_energies, all_times)
+
+        return mid_energies, all_times, i(X, Y)<<u.dimensionless_unscaled
+
+    # this is a big array so let's slice before interpolating
+    time_inds = np.nonzero((time_range[0]<=native_times) & (native_times<=time_range[1]))[0]
+
+    mid_energies = native_resolution(native_x=native_energies, input_x=mid_energies)
+    # energy_inds = np.nonzero((mid_energies[0]<=native_energies) & (native_energies<=mid_energies[-1]))[0]
+
+    # # we'll interpolate so make sure to include a range one wider for the energy range
+    # energy_inds = np.insert(energy_inds, 0, energy_inds[0]-1) if energy_inds[0]>0 else energy_inds
+    # energy_inds = np.insert(energy_inds, 1, energy_inds[-1]+1) if energy_inds[-1]<(len(energy_inds)-1) else energy_inds
+
+    times = native_times[time_inds]
+    transmissions = transmission[:,time_inds]
+
+    tave_transmissions = np.mean(transmissions, axis=1)
+
+    return mid_energies<<u.keV, times, np.interp(mid_energies.value, native_energies.value, tave_transmissions.value, left=0, right=0) << u.dimensionless_unscaled
+
+def asset_att(save_asset=False):
     mid_energies = create_energy_midpoints()
 
     tb_col, obf0_col, obf1_col, cdte_fixed2_col, cdte_fixed4_col = plt.cm.viridis([0, 0.2, 0.4, 0.6, 0.8])
@@ -189,14 +272,15 @@ if __name__=="__main__":
     
     plt.legend(handles=p1+p2+p3+p4+p5+p6+p7+p8+p9+p10+p11+p12)
     plt.tight_layout()
-    if SAVE_ASSETS:
-        plt.savefig(os.path.join(assets_dir,"transmissions.png"), dpi=200, bbox_inches="tight")
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"transmissions.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-    ## other
-    # collimator (so far, only have value for on-axis)
-    print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=0))
-    print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=1))
+def asset_sigmoid(save_asset=False):
+    mid_energies = create_energy_midpoints()
+
+    plt.figure(figsize=(10,8))
 
     # any fake/functionaly model attenuators
     # sigmoid
@@ -227,6 +311,92 @@ if __name__=="__main__":
 
     plt.legend(handles=p1+p2+p3+p4+p5+p6+p7+p8)
     plt.tight_layout()
-    if SAVE_ASSETS:
-        plt.savefig(os.path.join(assets_dir,"model-transmissions.png"), dpi=200, bbox_inches="tight")
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"model-transmissions.png"), dpi=200, bbox_inches="tight")
     plt.show()
+
+def asset_atm(save_asset=False):
+    fig = plt.figure(figsize=(10,5))
+
+    obs_start = 100
+    obs_mid = 280
+    obs_end = 461
+
+    gs = gridspec.GridSpec(1, 2)
+
+    gs_ax0 = fig.add_subplot(gs[0, 0])
+
+    energy0, time0 = [1]<<u.keV, np.nan<<u.second
+    _, t0, a0 = att_atmosphere(mid_energies=energy0, time_range=time0)
+    p0 = gs_ax0.plot(t0, a0, ls="-", label=f"energy:{energy0:latex} ,time:{time0:latex}")
+
+    energy1, time1 = [1, 3, 5, 10, 15]<<u.keV, np.nan<<u.second
+    _, t1, a1 = att_atmosphere(mid_energies=energy1, time_range=time1)
+    p1 = []
+    for i in range(len(energy1)):
+        p1 += gs_ax0.plot(t1, a1[:,i], ls=":", label=f"energy:{energy1[i]:latex}")
+
+    gs_ax0.set_ylabel(f"Transmission [{a0.unit:latex}]")
+    gs_ax0.set_xlabel(f"Time (Obs. start=100 s) [{t0.unit:latex}]")
+    gs_ax0.set_ylim([0,1.05])
+    gs_ax0.axvline(obs_start, ls=":")
+    gs_ax0.axvline(obs_mid, ls=":")
+    gs_ax0.axvline(obs_end, ls=":")
+    gs_ax0.set_xlim([0, 600])
+    # plt.xscale("log")
+
+    plt.legend(handles=p0+p1)
+    
+    gs_ax1 = fig.add_subplot(gs[0, 1])
+
+    energy2, time2 = np.nan<<u.keV, [obs_start, obs_end]<<u.second
+    e2, _, a2 = att_atmosphere(mid_energies=energy2, time_range=time2)
+    p2 = gs_ax1.plot(e2, a2, ls="-", label=f"time:{time2:latex}")
+
+    energy3, time3 = np.nan<<u.keV, np.nan<<u.second
+    e3, t3, a3 = att_atmosphere(mid_energies=energy3, time_range=time3)
+    # print(t3)
+    # st, mid, en = np.nonzero(t3==obs_start), np.nonzero(t3==obs_mid), np.nonzero(t3==obs_end)
+    p3 = gs_ax1.plot(e3, a3[:, 2000], ls="-", label=f"time:{t3[2000]:latex}")
+    p4 = gs_ax1.plot(e3, a3[:, 5600], ls="-", label=f"time:{t3[5600]:latex}")
+    p5 = gs_ax1.plot(e3, a3[:, 9200], ls="-", label=f"time:{t3[9200]:latex}")
+
+    gs_ax1.set_ylabel(f"Transmission [{a2.unit:latex}]")
+    gs_ax1.set_xlabel(f"Energy [{e2.unit:latex}]")
+    gs_ax1.set_ylim([0,1.05])
+    gs_ax1.set_xlim([1, 25])
+    gs_ax1.set_xscale("log")
+
+    plt.legend(handles=p2+p3+p4+p5)
+
+    plt.tight_layout()
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"atmospheric-transmissions.png"), dpi=200, bbox_inches="tight")
+    plt.show()
+
+if __name__=="__main__":
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+
+    from phot_spec import create_energy_midpoints, zeroes2nans
+
+    mid_energies = create_energy_midpoints()
+    # e0, t0, a0 = att_atmosphere(mid_energies=np.nan<<u.keV, time_range=None, file=None)
+    # e1, t1, a1 = att_atmosphere(mid_energies=np.nan<<u.keV, time_range=np.nan<<u.second, file=None)
+    # e2, t2, a2 = att_atmosphere(mid_energies=[1, 4, 6]<<u.keV, time_range=[100, 150]<<u.second, file=None)
+    # e3, t3, a3 = att_atmosphere(mid_energies=np.nan<<u.keV, time_range=[100, 150]<<u.second, file=None)
+    # exit()
+    SAVE_ASSETS = False
+    
+    # asset_att(save_asset=SAVE_ASSETS)
+    
+    # ## other
+    # # collimator (so far, only have value for on-axis)
+    # print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=0))
+    # print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=1))
+
+    # asset_sigmoid(save_asset=SAVE_ASSETS)
+
+    asset_atm(save_asset=SAVE_ASSETS)
