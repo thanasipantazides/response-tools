@@ -394,6 +394,8 @@ def asset_atm(save_asset=False):
 
     plt.legend(handles=p2+p3+p4+p5)
 
+    plt.suptitle("FOXSI-4 Flight Atmospheric Transmission")
+
     plt.tight_layout()
     if save_asset:
         pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
@@ -406,7 +408,7 @@ if __name__=="__main__":
 
     from phot_spec import create_energy_midpoints, zeroes2nans
 
-    SAVE_ASSETS = False
+    SAVE_ASSETS = True
     
     asset_att(save_asset=SAVE_ASSETS)
     
