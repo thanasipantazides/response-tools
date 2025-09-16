@@ -156,11 +156,33 @@ def att_atmosphere(mid_energies, time_range=None, file=None):
 
     Parameters
     ----------
-    mid_energies 
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the transmission is required. If 
+        `numpy.nan<<astropy.units.keV` is passed then an entry for all 
+        energies are returned.
 
-    time_range
+    time_range : `astropy.units.quantity.Quantity` or `None`
+        The time range the atmsopheric transmissions should be averaged
+        over. If `None`, `numpy.nan<<astropy.units.second`, or
+        `[numpy.nan, numpy.nan]<<astropy.units.second` then the full 
+        time will be considered and the output will not be averaged but 
+        a grid of the transmissions at all times and at any provided
+        energies.
     
-    file: `str` or `None`
+    file : `str` or `None`
+        Path/name of a custom file wanting to be loaded in as the 
+        atmospheric data file.
+
+    Returns
+    -------
+    : (`astropy.units.quantity.Quantity`, 
+       `astropy.units.quantity.Quantity`,
+       `astropy.units.quantity.Quantity`)
+    The energies for each transmission, the times that were either 
+    averaged over or (in the case of `None` or `numpy.nan`) the times 
+    corresponding to the transmission values, the transmission values 
+    as a list correspnding to the energy array or to both the energy and 
+    time arrays.
     """
     if (time_range is None) or np.all(np.isnan(time_range)):
         time_range = [np.nan, np.nan] << u.second
@@ -192,7 +214,9 @@ def att_atmosphere(mid_energies, time_range=None, file=None):
         cut_transmission = transmission[cut_native_energies_inds]
 
         x, y = np.meshgrid(cut_native_energies, native_times)
-        i = scipy.interpolate.LinearNDInterpolator(list(zip(x.flatten().value, y.flatten().value)), cut_transmission.T.flatten().value)
+        # PROPER INTERPOLATION: i = scipy.interpolate.LinearNDInterpolator(list(zip(x.flatten().value, y.flatten().value)), cut_transmission.T.flatten().value)
+        # the grid is really fine so is it good enough to just use nearest neighbours?
+        i = scipy.interpolate.NearestNDInterpolator(list(zip(x.flatten().value, y.flatten().value)), cut_transmission.T.flatten().value)
 
         mid_energies = native_resolution(native_x=native_energies, input_x=mid_energies)
         all_times = native_resolution(native_x=native_times, input_x=time_range)
@@ -265,7 +289,7 @@ def asset_att(save_asset=False):
     p12 = plt.plot(mid_energies, cmos_t3, color=cmost3_col, ls=":", label="CMOS1-OBF", lw=1)
 
     plt.ylim([0,1.05])
-    plt.xlim([0.5, 100])
+    plt.xlim([0.5, 30])
     plt.xscale("log")
 
     plt.title("Attenuators")
@@ -306,7 +330,7 @@ def asset_sigmoid(save_asset=False):
     plt.xlabel(f"Energy [{mid_energies.unit:latex}]")
     plt.title("Fake Attenuator, Sigmoid$=l/(1+exp^{-k*(x-x0)})+b")
     plt.ylim([0,1.05])
-    plt.xlim([0.5, 100])
+    plt.xlim([0.5, 30])
     plt.xscale("log")
 
     plt.legend(handles=p1+p2+p3+p4+p5+p6+p7+p8)
@@ -365,7 +389,7 @@ def asset_atm(save_asset=False):
     gs_ax1.set_ylabel(f"Transmission [{a2.unit:latex}]")
     gs_ax1.set_xlabel(f"Energy [{e2.unit:latex}]")
     gs_ax1.set_ylim([0,1.05])
-    gs_ax1.set_xlim([1, 25])
+    gs_ax1.set_xlim([0.01, 30])
     gs_ax1.set_xscale("log")
 
     plt.legend(handles=p2+p3+p4+p5)
@@ -382,21 +406,16 @@ if __name__=="__main__":
 
     from phot_spec import create_energy_midpoints, zeroes2nans
 
-    mid_energies = create_energy_midpoints()
-    # e0, t0, a0 = att_atmosphere(mid_energies=np.nan<<u.keV, time_range=None, file=None)
-    # e1, t1, a1 = att_atmosphere(mid_energies=np.nan<<u.keV, time_range=np.nan<<u.second, file=None)
-    # e2, t2, a2 = att_atmosphere(mid_energies=[1, 4, 6]<<u.keV, time_range=[100, 150]<<u.second, file=None)
-    # e3, t3, a3 = att_atmosphere(mid_energies=np.nan<<u.keV, time_range=[100, 150]<<u.second, file=None)
-    # exit()
     SAVE_ASSETS = False
     
-    # asset_att(save_asset=SAVE_ASSETS)
+    asset_att(save_asset=SAVE_ASSETS)
     
-    # ## other
-    # # collimator (so far, only have value for on-axis)
-    # print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=0))
-    # print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=1))
+    ## other
+    # collimator (so far, only have value for on-axis)
+    print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=0))
+    print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=1))
 
-    # asset_sigmoid(save_asset=SAVE_ASSETS)
+    asset_sigmoid(save_asset=SAVE_ASSETS)
+
 
     asset_atm(save_asset=SAVE_ASSETS)
