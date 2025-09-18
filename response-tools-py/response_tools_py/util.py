@@ -1,5 +1,8 @@
 """Generally useful functions."""
 
+from dataclasses import dataclass
+from pprint import pprint
+
 import numpy as np
 
 def native_resolution(native_x, input_x):
@@ -11,3 +14,36 @@ def native_resolution(native_x, input_x):
     then we only have to do it here and not literally everywhere.
     """
     return native_x if np.all(np.isnan(input_x)) else input_x
+@dataclass
+class BaseOutput:
+    """Class for keeping track of general response values."""
+    filename: str
+    # put the highest level function that returns the object
+    # designed to be overwritten if a wrapper is around a function, etc.
+    function: str 
+
+    @property
+    def contents(self):
+        return self.__dict__
+
+    @property
+    def fields(self):
+        return list(self.contents.keys())
+
+    @property
+    def print_contents(self):
+        pprint(self.contents)
+
+    def __getitem__(self, index):
+        """Allow the field names to be passed like indices too.
+        
+        Example
+        -----------
+        >>> ex = BaseOutput(filename="foo", function="bar")
+        >>> ex.filename
+        "foo"
+        >>> ex["filename"]
+        "foo"
+        """
+        return (self.contents | {"fields":self.fields})[index]
+    

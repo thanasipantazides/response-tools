@@ -1,8 +1,12 @@
-"""Code to load different detectro responses. """
+"""Code to load different detectro responses. 
+
+Returns FITS HDUs for the products.
+"""
 
 import logging
 import os
 import pathlib
+import sys
 
 from astropy.io import fits
 import astropy.units as u
@@ -12,23 +16,60 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "detector-response-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "det-resp-figs")
 
 def cdte_det_resp_rmf(file):
-    """Return the redistribution matrix from a given file."""
+    """Return the redistribution matrix for CdTe from a given file.
+
+    Parameters
+    ----------
+    file : `str`
+        The file for the RMF.
+
+    Returns
+    -------
+    : (`astropy.units.quantity.Quantity`, 
+       `astropy.units.quantity.Quantity`,
+       `astropy.units.quantity.Quantity`)
+    The energy bin edges for the photon (input) bin axis in keV, the 
+    energy bin edges for the count (output) bin axis in keV, and the 
+    redistribution matrix in units of counts/photon.
+    """
     e_lo, e_hi, ngrp, fchan, nchan, matrix = _read_rmf(file)
 
     fchan_array = col2arr_py(fchan)
     nchan_array = col2arr_py(nchan)
 
-    return e_lo<<u.keV, e_hi<<u.keV, vrmf2arr_py(data=matrix,
-                                                 n_grp_list=ngrp,
-                                                 f_chan_array=fchan_array,
-                                                 n_chan_array=nchan_array)<<(u.ct/u.ph)
+    energies = np.append(e_lo, e_hi[-1])
+
+    return energies<<u.keV, energies<<u.keV, vrmf2arr_py(data=matrix,
+                                                         n_grp_list=ngrp,
+                                                         f_chan_array=fchan_array,
+                                                         n_chan_array=nchan_array)<<(u.ct/u.ph)
 
 def cmos_det_resp(file=None, telescope=None):
+    """Return the redistribution matrix for CMOS from a given file.
+
+    Parameters
+    ----------
+    file : `str`
+        The file for the RMF.
+
+    telescope : `int`
+        Either 0 or 1.
+
+    Returns
+    -------
+    : (`astropy.units.quantity.Quantity`, 
+       `astropy.units.quantity.Quantity`,
+       `astropy.units.quantity.Quantity`)
+    The energy bin edges for the photon (input) bin axis in keV, the 
+    energy bin edges for the count (output) bin axis in keV, and the 
+    redistribution matrix in units of counts/photon.
+    """
 
     if telescope is None:
-        logging.warning("`telescope` input in cmos_det_resp()` must be 0 or 1.")
+        logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
         
     _f = os.path.join(DET_RESP_PATH, 
@@ -37,7 +78,7 @@ def cmos_det_resp(file=None, telescope=None):
     
     with fits.open(_f) as hdul:
         matrix, counts, energy = hdul[1].data<<(u.ct/u.ph), hdul[2].data<<u.dimensionless_unscaled, hdul[3].data<<u.keV # units?
-    return counts, energy, matrix 
+    return energy, counts, matrix 
 
 def _read_rmf(file):
     """
@@ -232,20 +273,14 @@ def vrmf2arr_py(data=None, n_grp_list=None, f_chan_array=None, n_chan_array=None
 
     return mat_array_py
 
-
-if __name__=="__main__":
-
-    SAVE_ASSETS = False
-    assets_dir = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "det-resp-figs")
-    pathlib.Path(assets_dir).mkdir(parents=True, exist_ok=True)
-
+def asset_cmos_resp(save_asset=False):
     # CMOS
     fig = plt.figure(figsize=(12,7))
 
     gs = gridspec.GridSpec(1, 2)
     gs_ax0 = fig.add_subplot(gs[0, 0])
     telescope = 0
-    c, e, m = cmos_det_resp(file=None, telescope=telescope)
+    e, c, m = cmos_det_resp(file=None, telescope=telescope)
     extent = [np.min(c.value), np.max(c.value), np.min(e.value), np.max(e.value)]
     i = gs_ax0.imshow(m.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
     gs_ax0.set_ylim([0,10])
@@ -260,7 +295,7 @@ if __name__=="__main__":
 
     gs_ax1 = fig.add_subplot(gs[0, 1])
     telescope = 1
-    c, e, m = cmos_det_resp(file=None, telescope=telescope)
+    e, c, m = cmos_det_resp(file=None, telescope=telescope)
     extent = [np.min(c.value), np.max(c.value), np.min(e.value), np.max(e.value)]
     i = gs_ax1.imshow(m.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
     gs_ax1.set_ylim([0,10])
@@ -273,22 +308,31 @@ if __name__=="__main__":
     cax.tick_params(axis='both', which='major', labelsize=6)
 
     plt.tight_layout()
-    if SAVE_ASSETS:
-        plt.savefig(os.path.join(assets_dir,"cmos-response-matrices.png"), dpi=200, bbox_inches="tight")
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"cmos-response-matrices.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
+def asset_cdte_resp(save_asset=False):
     # CdTe
     d_rmf = os.path.join(DET_RESP_PATH, "cdte", "pt") 
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"
 
-
-    e_lo, e_hi, rmf = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
+    photon_es, count_es, rmf = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
 
     fig = plt.figure(figsize=(12, 5))
     gs = gridspec.GridSpec(1, 2)
 
     gs_ax0 = fig.add_subplot(gs[0, 0])
-    r = gs_ax0.imshow(rmf.value, origin="lower", norm=Normalize(vmin=0.001, vmax=0.12), extent=[np.min(e_lo.value), np.max(e_lo.value), np.min(e_lo.value), np.max(e_lo.value)])
+    r = gs_ax0.imshow(rmf.value, 
+                      origin="lower", 
+                      norm=Normalize(vmin=0.001, 
+                                     vmax=np.max(rmf.value)*0.9), 
+                      extent=[np.min(count_es.value), 
+                              np.max(count_es.value), 
+                              np.min(photon_es.value), 
+                              np.max(photon_es.value)]
+                      )
     cbar = plt.colorbar(r)
     cbar.ax.set_ylabel('Counts photon$^{-1}$')
     fig.suptitle(d_rmf+f_rmf)
@@ -297,7 +341,15 @@ if __name__=="__main__":
     gs_ax0.set_title("Linear Scale")
 
     gs_ax0 = fig.add_subplot(gs[0, 1])
-    r = gs_ax0.imshow(rmf.value, origin="lower", norm=LogNorm(vmin=0.001, vmax=0.12), extent=[np.min(e_lo.value), np.max(e_lo.value), np.min(e_lo.value), np.max(e_lo.value)])
+    r = gs_ax0.imshow(rmf.value, 
+                      origin="lower", 
+                      norm=LogNorm(vmin=0.001, 
+                                   vmax=np.max(rmf.value)*0.9), 
+                      extent=[np.min(count_es.value), 
+                              np.max(count_es.value), 
+                              np.min(photon_es.value), 
+                              np.max(photon_es.value)]
+                      )
     cbar = plt.colorbar(r)
     cbar.ax.set_ylabel('Counts photon$^{-1}$')
     fig.suptitle(d_rmf+f_rmf)
@@ -305,6 +357,15 @@ if __name__=="__main__":
     gs_ax0.set_ylabel("Photon Energy [keV]")
     gs_ax0.set_title("Log Scale")
 
-    if SAVE_ASSETS:
-        plt.savefig(os.path.join(assets_dir,"cdte-response-matrix.png"), dpi=200, bbox_inches="tight")
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"cdte-response-matrix.png"), dpi=200, bbox_inches="tight")
     plt.show()
+
+if __name__=="__main__":
+
+    SAVE_ASSETS = False
+
+    asset_cdte_resp(save_asset=SAVE_ASSETS)
+    
+    asset_cmos_resp(save_asset=SAVE_ASSETS)
