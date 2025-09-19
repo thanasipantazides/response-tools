@@ -66,7 +66,7 @@ def att_thermal_blanket(mid_energies, file=None):
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              att_es.value, 
@@ -114,7 +114,7 @@ def att_uniform_al_cdte(mid_energies, position=None, file=None):
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              att_es.value, 
@@ -165,7 +165,7 @@ def att_pixelated(mid_energies, use_model=False, file=None):
         att_vals = att_values_measured
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              att_es.value, 
@@ -206,7 +206,7 @@ def att_al_mylar(mid_energies, file=None):
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              att_es.value, 
@@ -234,7 +234,7 @@ def _att_old_prefilter(mid_energies, position=None, file=None):
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              att_es.value, 
@@ -269,7 +269,7 @@ def att_sigmoid(mid_energies, l ,x0, k, b):
     """
 
     return AttOutput(filename="No-File",
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=(l / (1 + np.exp(-k*(mid_energies.value-x0))) + b) << u.dimensionless_unscaled,
                      attenuation_type=f"Analytical-Sigmoid-Model",
@@ -313,7 +313,7 @@ def att_cmos_filter(mid_energies, telescope=None, file=None):
     mid_energies = native_resolution(native_x=es, input_x=mid_energies)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              es.value, 
@@ -361,7 +361,7 @@ def att_cmos_obfilter(mid_energies, telescope=None, file=None):
     mid_energies = native_resolution(native_x=es, input_x=mid_energies)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies,
                      transmissions=np.interp(mid_energies.value, 
                                              es.value, 
@@ -408,7 +408,7 @@ def att_cmos_collimator_ratio(off_axis_angle, telescope=None, file=None):
     off_axis_angle = native_resolution(native_x=oa_angles, input_x=off_axis_angle)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      off_axis_angle=off_axis_angle,
                      transmissions=np.interp(off_axis_angle.value, 
                                              oa_angles.value, 
@@ -491,7 +491,7 @@ def att_atmosphere(mid_energies, time_range=None, file=None):
         if np.all(np.isnan(mid_energies)):
             # don't bother going further if we're just going to return the native data
             return AttOutput(filename=_f,
-                             function=f"{sys._getframe().f_code.co_name}",
+                             function_path=f"{sys._getframe().f_code.co_name}",
                              mid_energies=native_energies<<u.keV,
                              times=native_times,
                              transmissions=transmission,
@@ -514,7 +514,7 @@ def att_atmosphere(mid_energies, time_range=None, file=None):
         X, Y = np.meshgrid(mid_energies, all_times)
 
         return AttOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          times=all_times,
                          transmissions=i(X, Y)<<u.dimensionless_unscaled,
@@ -538,7 +538,7 @@ def att_atmosphere(mid_energies, time_range=None, file=None):
     tave_transmissions = np.mean(transmissions, axis=1)
 
     return AttOutput(filename=_f,
-                     function=f"{sys._getframe().f_code.co_name}",
+                     function_path=f"{sys._getframe().f_code.co_name}",
                      mid_energies=mid_energies<<u.keV,
                      times=times,
                      transmissions=np.interp(mid_energies.value, 

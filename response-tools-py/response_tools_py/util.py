@@ -20,21 +20,28 @@ class BaseOutput:
     filename: str
     # put the highest level function that returns the object
     # designed to be overwritten if a wrapper is around a function, etc.
-    function: str 
+    function_path: str 
 
     @property
     def contents(self):
+        """Contents of the data class. """
         return self.__dict__
 
     @property
     def fields(self):
+        """Just the names of the fields in the data class. """
         return list(self.contents.keys())
 
     @property
     def print_contents(self):
+        """Print the contents of the data class in a nice way. """
         pprint(self.contents)
 
-    def __getitem__(self, index):
+    def update_function_path(self, new_function_name:str):
+        """Should help tracking nested function if needed."""
+        self.function_path += f"\n->{new_function_name}"
+
+    def __getitem__(self, index:str):
         """Allow the field names to be passed like indices too.
         
         Example

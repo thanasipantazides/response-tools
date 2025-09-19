@@ -94,7 +94,7 @@ def eff_area_msfc_10shell(mid_energies, off_axis_angle=0<<u.arcmin, optic_id=Non
     off_axis_angle = native_resolution(native_x=off_axis_angles_tilt, input_x=off_axis_angle)
 
     return EffAreaOutput(filename=f"tilt:{_ft}, pan:{_fp}",
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle=off_axis_angle,
                          effective_areas=i(mid_energies, 
@@ -180,7 +180,7 @@ def eff_area_msfc_hi_res(mid_energies, position=None, use_model=False, file=None
         return
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -207,7 +207,7 @@ def _eff_area_msfc(mid_energies, file=None):
     mid_energies = native_resolution(native_x=msfc_hi_res_es, input_x=mid_energies)
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -232,7 +232,7 @@ def _eff_area_nagoya(mid_energies, file=None):
     mid_energies = native_resolution(native_x=nagoya_sxr_es, input_x=mid_energies)
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -287,7 +287,7 @@ def eff_area_nagoya_hxt(mid_energies, use_model=False, file=None):
     mid_energies = native_resolution(native_x=nagoya_hxr_es, input_x=mid_energies)
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -344,7 +344,7 @@ def eff_area_nagoya_sxt(mid_energies, use_model=False, file=None):
     mid_energies = native_resolution(native_x=nagoya_sxr_es, input_x=mid_energies)
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -402,7 +402,7 @@ def eff_area_cmos(mid_energies, telescope=None, file=None):
     position_alias = {0:"CMOS-X10/FM2", 1:"CMOS-Nagoya-SXT"}
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -470,7 +470,7 @@ def eff_area_cmos_telescope(mid_energies, telescope=None, file=None):
     position_alias = {0:"Telescope-CMOS-X10/FM2", 1:"Telescope-CMOS-Nagoya-SXT"}
 
     return EffAreaOutput(filename=_f,
-                         function=f"{sys._getframe().f_code.co_name}",
+                         function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle="N/A",
                          effective_areas=np.interp(mid_energies.value, 
@@ -549,7 +549,7 @@ def asset_cmos_files(save_asset=False):
     gs_ax1 = fig.add_subplot(gs[0, 1])
     a1 = eff_area_cmos(mid_energies, telescope=1)
     nag_sxt = eff_area_nagoya_sxt(mid_energies)
-    gs_ax1.plot(mid_energies, a1.effective_areas*att_cmos_obfilter(mid_energies, telescope=1)[1]*att_cmos_collimator_ratio(0<<u.arcmin, telescope=1)[1], label="CMOS telescope 1*collimator*obf, position 1")
+    gs_ax1.plot(mid_energies, a1.effective_areas*att_cmos_obfilter(mid_energies, telescope=1).transmissions*att_cmos_collimator_ratio(0<<u.arcmin, telescope=1).transmissions, label="CMOS telescope 1*collimator*obf, position 1")
     gs_ax1.plot(mid_energies, nag_sxt.effective_areas, label="Nagoya SXT (meas.) position 1")
     gs_ax1.set_title("CMOS SXR Optics: Position 1")
     gs_ax1.set_ylabel(f"Effective Area [{a1.effective_areas.unit:latex}]")
@@ -561,7 +561,7 @@ def asset_cmos_files(save_asset=False):
     plt.xlim([0,20])
 
     # print(a1)
-    print(att_cmos_collimator_ratio(0<<u.arcmin, telescope=0), 1/att_cmos_collimator_ratio(0<<u.arcmin, telescope=0)[1])
+    print(att_cmos_collimator_ratio(0<<u.arcmin, telescope=0), 1/att_cmos_collimator_ratio(0<<u.arcmin, telescope=0).transmissions)
 
     plt.tight_layout()
     if save_asset:

@@ -1,7 +1,6 @@
-"""Code to load different detectro responses. 
+"""Code to load different detectro responses. """
 
-Returns FITS HDUs for the products.
-"""
+from dataclasses import dataclass
 
 import logging
 import os
@@ -15,8 +14,22 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 
+from response_tools_py.util import BaseOutput
+
 DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "detector-response-data")
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "det-resp-figs")
+
+@dataclass
+class DetectorResponseOutput(BaseOutput):
+    """Class for keeping track of effective area response values."""
+    # numbers
+    input_energy_edges: u.Quantity # photon axis
+    output_energy_edges: u.Quantity # count axis
+    detector_response: u.Quantity # rmf
+    # bookkeeping
+    detector: str
+    # any other fields needed can be added here
+    # can even add with a default so the input is not required for every other instance
 
 def cdte_det_resp_rmf(file):
     """Return the redistribution matrix for CdTe from a given file.
@@ -28,24 +41,27 @@ def cdte_det_resp_rmf(file):
 
     Returns
     -------
-    : (`astropy.units.quantity.Quantity`, 
-       `astropy.units.quantity.Quantity`,
-       `astropy.units.quantity.Quantity`)
-    The energy bin edges for the photon (input) bin axis in keV, the 
-    energy bin edges for the count (output) bin axis in keV, and the 
-    redistribution matrix in units of counts/photon.
+    : `DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
     """
     e_lo, e_hi, ngrp, fchan, nchan, matrix = _read_rmf(file)
 
     fchan_array = col2arr_py(fchan)
     nchan_array = col2arr_py(nchan)
 
-    energies = np.append(e_lo, e_hi[-1])
+    energies = np.append(e_lo, e_hi[-1])<<u.keV
 
-    return energies<<u.keV, energies<<u.keV, vrmf2arr_py(data=matrix,
-                                                         n_grp_list=ngrp,
-                                                         f_chan_array=fchan_array,
-                                                         n_chan_array=nchan_array)<<(u.ct/u.ph)
+    return DetectorResponseOutput(filename=file,
+                                  function_path=f"{sys._getframe().f_code.co_name}",
+                                  input_energy_edges=energies,
+                                  output_energy_edges=energies,
+                                  detector_response=vrmf2arr_py(data=matrix,
+                                                                n_grp_list=ngrp,
+                                                                f_chan_array=fchan_array,
+                                                                n_chan_array=nchan_array)<<(u.ct/u.ph),
+                                  detector="CdTe-General-Detector-Response"
+                                  )
 
 def cmos_det_resp(file=None, telescope=None):
     """Return the redistribution matrix for CMOS from a given file.
@@ -60,15 +76,12 @@ def cmos_det_resp(file=None, telescope=None):
 
     Returns
     -------
-    : (`astropy.units.quantity.Quantity`, 
-       `astropy.units.quantity.Quantity`,
-       `astropy.units.quantity.Quantity`)
-    The energy bin edges for the photon (input) bin axis in keV, the 
-    energy bin edges for the count (output) bin axis in keV, and the 
-    redistribution matrix in units of counts/photon.
+    : `DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
     """
 
-    if telescope is None:
+    if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
         
@@ -77,8 +90,15 @@ def cmos_det_resp(file=None, telescope=None):
                       f"foxsi4_telescope-{telescope}_BASIC_RESPONSE_MATRIX_v1.fits") if file is None else file
     
     with fits.open(_f) as hdul:
-        matrix, counts, energy = hdul[1].data<<(u.ct/u.ph), hdul[2].data<<u.dimensionless_unscaled, hdul[3].data<<u.keV # units?
-    return energy, counts, matrix 
+        matrix, counts, energy = hdul[1].data<<(u.DN/u.ph), hdul[2].data<<u.DN, hdul[3].data<<u.keV # units?
+
+    return DetectorResponseOutput(filename=file,
+                                  function_path=f"{sys._getframe().f_code.co_name}",
+                                  input_energy_edges=energy,
+                                  output_energy_edges=counts,
+                                  detector_response=matrix,
+                                  detector=f"CMOS{telescope}-Detector-Response"
+                                  )
 
 def _read_rmf(file):
     """
@@ -280,31 +300,37 @@ def asset_cmos_resp(save_asset=False):
     gs = gridspec.GridSpec(1, 2)
     gs_ax0 = fig.add_subplot(gs[0, 0])
     telescope = 0
-    e, c, m = cmos_det_resp(file=None, telescope=telescope)
-    extent = [np.min(c.value), np.max(c.value), np.min(e.value), np.max(e.value)]
-    i = gs_ax0.imshow(m.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
+    cmos0_resp = cmos_det_resp(file=None, telescope=telescope)
+    extent = [np.min(cmos0_resp.output_energy_edges.value), 
+              np.max(cmos0_resp.output_energy_edges.value), 
+              np.min(cmos0_resp.input_energy_edges.value), 
+              np.max(cmos0_resp.input_energy_edges.value)]
+    i = gs_ax0.imshow(cmos0_resp.detector_response.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
     gs_ax0.set_ylim([0,10])
-    gs_ax0.set_xlabel("Counts?")
-    gs_ax0.set_ylabel(f"Energy? [{e.unit:latex}]")
+    gs_ax0.set_xlabel(f"Counts [{cmos0_resp.output_energy_edges.unit:latex}]")
+    gs_ax0.set_ylabel(f"Energy [{cmos0_resp.input_energy_edges.unit:latex}]")
     gs_ax0.set_title(f"CMOS{telescope}")
     cax = gs_ax0.inset_axes([0.1, 0.08, 0.8, 0.05],)
     cbar = fig.colorbar(i, cax=cax, orientation='horizontal')
-    cbar.set_label(f"{m.unit:latex}?", size=8, labelpad=0)
+    cbar.set_label(f"{cmos0_resp.detector_response.unit:latex}", size=8, labelpad=0)
     cax.tick_params(axis='both', which='major', labelsize=6)
 
 
     gs_ax1 = fig.add_subplot(gs[0, 1])
     telescope = 1
-    e, c, m = cmos_det_resp(file=None, telescope=telescope)
-    extent = [np.min(c.value), np.max(c.value), np.min(e.value), np.max(e.value)]
-    i = gs_ax1.imshow(m.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
+    cmos1_resp = cmos_det_resp(file=None, telescope=telescope)
+    extent = [np.min(cmos1_resp.output_energy_edges.value), 
+              np.max(cmos1_resp.output_energy_edges.value), 
+              np.min(cmos1_resp.input_energy_edges.value), 
+              np.max(cmos1_resp.input_energy_edges.value)]
+    i = gs_ax1.imshow(cmos1_resp.detector_response.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
     gs_ax1.set_ylim([0,10])
-    gs_ax1.set_xlabel("Counts?")
-    gs_ax1.set_ylabel(f"Energy? [{e.unit:latex}]")
+    gs_ax1.set_xlabel(f"Counts [{cmos1_resp.output_energy_edges.unit:latex}]")
+    gs_ax1.set_ylabel(f"Energy [{cmos1_resp.input_energy_edges.unit:latex}]")
     gs_ax1.set_title(f"CMOS{telescope}")
     cax = gs_ax1.inset_axes([0.1, 0.08, 0.8, 0.05],)
     cbar = fig.colorbar(i, cax=cax, orientation='horizontal')
-    cbar.set_label(f"{m.unit:latex}?", size=8, labelpad=0)
+    cbar.set_label(f"{cmos1_resp.detector_response.unit:latex}", size=8, labelpad=0)
     cax.tick_params(axis='both', which='major', labelsize=6)
 
     plt.tight_layout()
@@ -318,44 +344,44 @@ def asset_cdte_resp(save_asset=False):
     d_rmf = os.path.join(DET_RESP_PATH, "cdte", "pt") 
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"
 
-    photon_es, count_es, rmf = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
+    cdte_resp = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
 
     fig = plt.figure(figsize=(12, 5))
     gs = gridspec.GridSpec(1, 2)
 
     gs_ax0 = fig.add_subplot(gs[0, 0])
-    r = gs_ax0.imshow(rmf.value, 
+    r = gs_ax0.imshow(cdte_resp.detector_response.value, 
                       origin="lower", 
                       norm=Normalize(vmin=0.001, 
-                                     vmax=np.max(rmf.value)*0.9), 
-                      extent=[np.min(count_es.value), 
-                              np.max(count_es.value), 
-                              np.min(photon_es.value), 
-                              np.max(photon_es.value)]
+                                     vmax=np.max(cdte_resp.detector_response.value)*0.9), 
+                      extent=[np.min(cdte_resp.output_energy_edges.value), 
+                              np.max(cdte_resp.output_energy_edges.value), 
+                              np.min(cdte_resp.input_energy_edges.value), 
+                              np.max(cdte_resp.input_energy_edges.value)]
                       )
     cbar = plt.colorbar(r)
-    cbar.ax.set_ylabel('Counts photon$^{-1}$')
-    fig.suptitle(d_rmf+f_rmf)
-    gs_ax0.set_xlabel("Count Energy [keV]")
-    gs_ax0.set_ylabel("Photon Energy [keV]")
+    cbar.ax.set_ylabel(f"Response [{cdte_resp.detector_response.unit:latex}]")
+    gs_ax0.set_xlabel(f"Count Energy [{cdte_resp.output_energy_edges.unit:latex}]")
+    gs_ax0.set_ylabel(f"Photon Energy [{cdte_resp.input_energy_edges.unit:latex}]")
     gs_ax0.set_title("Linear Scale")
 
-    gs_ax0 = fig.add_subplot(gs[0, 1])
-    r = gs_ax0.imshow(rmf.value, 
+    gs_ax1 = fig.add_subplot(gs[0, 1])
+    r = gs_ax1.imshow(cdte_resp.detector_response.value, 
                       origin="lower", 
                       norm=LogNorm(vmin=0.001, 
-                                   vmax=np.max(rmf.value)*0.9), 
-                      extent=[np.min(count_es.value), 
-                              np.max(count_es.value), 
-                              np.min(photon_es.value), 
-                              np.max(photon_es.value)]
+                                   vmax=np.max(cdte_resp.detector_response.value)*0.9), 
+                      extent=[np.min(cdte_resp.output_energy_edges.value), 
+                              np.max(cdte_resp.output_energy_edges.value), 
+                              np.min(cdte_resp.input_energy_edges.value), 
+                              np.max(cdte_resp.input_energy_edges.value)]
                       )
     cbar = plt.colorbar(r)
-    cbar.ax.set_ylabel('Counts photon$^{-1}$')
-    fig.suptitle(d_rmf+f_rmf)
-    gs_ax0.set_xlabel("Count Energy [keV]")
-    gs_ax0.set_ylabel("Photon Energy [keV]")
-    gs_ax0.set_title("Log Scale")
+    cbar.ax.set_ylabel(f"Response [{cdte_resp.detector_response.unit:latex}]")
+    gs_ax1.set_xlabel(f"Count Energy [{cdte_resp.output_energy_edges.unit:latex}]")
+    gs_ax1.set_ylabel(f"Photon Energy [{cdte_resp.input_energy_edges.unit:latex}]")
+    gs_ax1.set_title("Log Scale")
+
+    fig.suptitle(f_rmf)
 
     if save_asset:
         pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
