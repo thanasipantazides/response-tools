@@ -93,12 +93,14 @@ def eff_area_msfc_10shell(mid_energies, off_axis_angle=0<<u.arcmin, optic_id=Non
     mid_energies = native_resolution(native_x=ea_energies, input_x=mid_energies)
     off_axis_angle = native_resolution(native_x=off_axis_angles_tilt, input_x=off_axis_angle)
 
+    effective_areas = i(mid_energies, off_axis_angle) << u.cm**2
+    effective_areas[effective_areas<0<<u.cm**2] = 0<<u.cm**2
+
     return EffAreaOutput(filename=f"tilt:{_ft}, pan:{_fp}",
                          function_path=f"{sys._getframe().f_code.co_name}",
                          mid_energies=mid_energies,
                          off_axis_angle=off_axis_angle,
-                         effective_areas=i(mid_energies, 
-                                           off_axis_angle) << u.cm**2,
+                         effective_areas=effective_areas,
                          optic_id=_id,
                          model=False,
                          )

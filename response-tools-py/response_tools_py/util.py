@@ -14,6 +14,7 @@ def native_resolution(native_x, input_x):
     then we only have to do it here and not literally everywhere.
     """
     return native_x if np.all(np.isnan(input_x)) else input_x
+
 @dataclass
 class BaseOutput:
     """Class for keeping track of general response values."""
