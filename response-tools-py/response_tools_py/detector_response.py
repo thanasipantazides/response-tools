@@ -9,9 +9,6 @@ import sys
 
 from astropy.io import fits
 import astropy.units as u
-from matplotlib.colors import LogNorm, Normalize
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
 import numpy as np
 
 from response_tools_py.util import BaseOutput
@@ -484,6 +481,9 @@ def asset_cdte_resp(save_asset=False):
     plt.show()
 
 if __name__=="__main__":
+    from matplotlib.colors import LogNorm, Normalize
+    import matplotlib.gridspec as gridspec
+    import matplotlib.pyplot as plt
 
     SAVE_ASSETS = False
 

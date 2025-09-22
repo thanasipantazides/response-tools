@@ -240,7 +240,7 @@ def foxsi4_position3_pixelated_attenuator(mid_energies):
         `.contents` on the output.
     """
     r = att_pixelated(mid_energies, 
-                      values="modelled")
+                      use_model=True)
     r.update_function_path(sys._getframe().f_code.co_name)
     return r
 
@@ -520,7 +520,7 @@ def foxsi4_position5_pixelated_attenuator(mid_energies):
         `.contents` on the output.
     """
     r = att_pixelated(mid_energies, 
-                      values="modelled")
+                      use_model=True)
     r.update_function_path(sys._getframe().f_code.co_name)
     return r
 
