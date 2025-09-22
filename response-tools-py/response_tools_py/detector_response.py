@@ -63,6 +63,101 @@ def cdte_det_resp_rmf(file):
                                   detector="CdTe-General-Detector-Response"
                                   )
 
+@u.quantity_input(pitch=u.um)
+def cdte_det_resp(cdte:int=None, region:int=None, pitch=None, side:str="merged", event_type:str="all", file=None):
+    """Return the redistribution matrix for CdTe from a given file.
+
+    Requires the `cdte` input and _either_ `region` _xor_ `pitch`.
+
+    Wrapper for `cdte_det_resp_rmf` with bookkeeping.
+
+    Parameters
+    ----------
+    cdte : `int`
+        The CdTe detector number. Must be in [1,2,3,4].
+
+    region : `int`
+        The region of the CdTe detector required. Either provide 
+        `region` _xor_ `pitch`. The `region` maps onto the pitches used 
+        across the detector. 
+            Region 0 -> 60<<astropy.units.um 
+            Region 1 -> 80<<astropy.units.um
+            Region 2 -> 100<<astropy.units.um
+
+    pitch : `astropy.units.quantity.Quantity`
+        Instead of `region`, it might be more usefule to specify the 
+        pitch in physical units (must b convertable to 
+        `astropy.units.um`). Either provide `region` _xor_ `pitch`.
+        The pitches map onto the `region` input.
+            60<<astropy.units.um -> Region 0
+            80<<astropy.units.um -> Region 1
+            100<<astropy.units.um -> Region 2
+
+    side : `str`
+        Define the side on the detector the user requires the response 
+        from. Must be in ["pt", "merged"].
+        Default: "merged"
+
+    event_type : `str`
+        Define the type of event trigger being considered in the 
+        response. Must be in ["1hit", "2hit", ("all", "mix")]. 
+        Note: \"all\" and \"mix\" are the same but some from different 
+        naming conventions on the merged and individual detector sides. 
+        This will be fixed at some point in the future.
+        Default: "all"
+
+    file : `str`
+        The file for the RMF.
+
+    Returns
+    -------
+    : `DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+
+    have_region, have_pitch = (region is not None), (pitch is not None)
+    pitch2region = {60<<u.um:0, 80<<u.um:1, 100<<u.um:2}
+    valid_region, valid_pitch = (region in list(pitch2region.values())), (pitch in list(pitch2region.keys()))
+
+    if (cdte is None) or (cdte not in [1,2,3,4]):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, `cdte` must be given and in [1,2,3,4].")
+        return 
+    
+    if ((not have_region) and (not have_pitch)) \
+        or (have_region and have_pitch):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, either `region` [0,1,2] _xor_ `pitch` [60<<u.um,80<<u.um,100<<u.um] must be given.")
+        return 
+    
+    if have_region and (not valid_region):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `region` must be in [0,1,2].")
+        return 
+
+    if have_pitch and (not valid_pitch):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `pitch` must be in [60<<u.um,80<<u.um,100<<u.um].")
+        return 
+    
+    if side not in ["pt", "merged"]:
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `side` must be in [\"pt\", \"merged\"].")
+        return 
+    
+    if event_type not in ["1hit", "2hit", "all", "mix"]:
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `event_type` must be in [\"1hit\", \"2hit\", (\"all\", \"mix\")].")
+        return 
+    
+    if side=="merged" and event_type=="mix":
+        event_type="all"
+    elif side in ["pt"] and event_type=="all":
+        event_type="mix"
+    
+    region = pitch2region[pitch] if have_pitch else region
+    
+    _f = os.path.join(DET_RESP_PATH, "cdte", side, f"Resp_3keVto30keV_CdTe{cdte}_reg{region}_{event_type}.rmf") if file is None else file
+    r = cdte_det_resp_rmf(_f)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    r.detector = f"CdTe{cdte}-Detector-Response"
+    return r
+
 def cmos_det_resp(file=None, telescope=None):
     """Return the redistribution matrix for CMOS from a given file.
 

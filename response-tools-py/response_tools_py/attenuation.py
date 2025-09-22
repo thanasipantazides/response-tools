@@ -1,7 +1,4 @@
-"""Code to load different attenuators. 
-
-Returns FITS HDUs for the products.
-"""
+"""Code to load different attenuators. """
 
 from dataclasses import dataclass
 import logging
@@ -420,7 +417,7 @@ def att_cmos_collimator_ratio(off_axis_angle, telescope=None, file=None):
                      )
 
 @u.quantity_input(mid_energies=u.keV, time=u.second)
-def att_atmosphere(mid_energies, time_range=None, file=None):
+def att_foxsi4_atmosphere(mid_energies, time_range=None, file=None):
     """ 
     Atmsopheric attenuation from and for FOXSI-4 flight data.
 
@@ -661,11 +658,11 @@ def asset_atm(save_asset=False):
     gs_ax0 = fig.add_subplot(gs[0, 0])
 
     energy0, time0 = [1]<<u.keV, np.nan<<u.second
-    atm0 = att_atmosphere(mid_energies=energy0, time_range=time0)
+    atm0 = att_foxsi4_atmosphere(mid_energies=energy0, time_range=time0)
     p0 = gs_ax0.plot(atm0.times, atm0.transmissions, ls=":", label=f"energy:{energy0:latex}\ntime:{time0:latex}", lw=3)
 
     energy1, time1 = [1, 3, 5, 10, 15]<<u.keV, np.nan<<u.second
-    atm1 = att_atmosphere(mid_energies=energy1, time_range=time1)
+    atm1 = att_foxsi4_atmosphere(mid_energies=energy1, time_range=time1)
     p1 = []
     for i in range(len(energy1)):
         p1 += gs_ax0.plot(atm1.times, atm1.transmissions[:,i], ls="-", label=f"energy:{energy1[i]:latex}")
@@ -684,11 +681,11 @@ def asset_atm(save_asset=False):
     gs_ax1 = fig.add_subplot(gs[0, 1])
 
     energy2, time2 = np.nan<<u.keV, [obs_start, obs_end]<<u.second
-    atm2 = att_atmosphere(mid_energies=energy2, time_range=time2)
+    atm2 = att_foxsi4_atmosphere(mid_energies=energy2, time_range=time2)
     p2 = gs_ax1.plot(atm2.mid_energies, atm2.transmissions, ls="-", label=f"time range:{time2:latex}")
 
     energy3, time3 = np.nan<<u.keV, np.nan<<u.second
-    atm3 = att_atmosphere(mid_energies=energy3, time_range=time3)
+    atm3 = att_foxsi4_atmosphere(mid_energies=energy3, time_range=time3)
 
     # will come back here: st, mid, en = np.nonzero(t3==obs_start), np.nonzero(t3==obs_mid), np.nonzero(t3==obs_end)
     p3 = gs_ax1.plot(atm3.mid_energies, atm3.transmissions[:, 2000], ls="-", label=f"time:{atm3.times[2000]:latex}")
@@ -707,12 +704,12 @@ def asset_atm(save_asset=False):
     gs_ax2 = fig.add_subplot(gs[0, 2])
 
     energy4, time4 = [0.01, 0.02, 0.05, 0.1, 0.3, 0.5, 1, 3, 5, 10, 15, 30]<<u.keV, [obs_start, obs_end]<<u.second
-    atm4 = att_atmosphere(mid_energies=energy4, time_range=time4)
+    atm4 = att_foxsi4_atmosphere(mid_energies=energy4, time_range=time4)
     colour4 = "blue"
     p6 = gs_ax2.plot(atm4.mid_energies, atm4.transmissions, label=f"time range:{atm4.times[0]:.2f}$-${atm4.times[-1]:.2f}\nrandom-ish energy sampling", marker="x", ms=4, c=colour4)
 
     energy5, time5 = np.arange(3,30.1, 0.1)<<u.keV, [obs_start, obs_end]<<u.second
-    atm5 = att_atmosphere(mid_energies=energy5, time_range=time5)
+    atm5 = att_foxsi4_atmosphere(mid_energies=energy5, time_range=time5)
     colour5 = "orange"
     gs_ax2.plot(atm5.mid_energies, atm5.transmissions, label=f"time range:{atm5.times[0]:.2f}$-${atm5.times[-1]:.2f}\nCdTe range+response resolution", marker="x", ms=2, c=colour5)
     # inset Axes for the CdTe plot

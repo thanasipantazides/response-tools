@@ -6,7 +6,7 @@ import sys
 
 import astropy.units as u
 
-from response_tools_py.attenuation import att_atmosphere
+from response_tools_py.attenuation import att_foxsi4_atmosphere
 import response_tools_py.telescope_parts as tp
 from response_tools_py.util import BaseOutput
 
@@ -37,14 +37,14 @@ class Response2DOutput(BaseOutput):
     # any other fields needed can be added here
     # can even add with a default so the input is not required for every other instance
 
-# position 2
+# telescope 2
 @u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
-def position2_arf(mid_energies, off_axis_angle):
-    """The ARF for position 2. """
-    tb = tp.position2_thermal_blanket(mid_energies) 
-    opt = tp.position2_optics(mid_energies, 
+def foxsi4_telescope2_arf(mid_energies, off_axis_angle):
+    """The ARF for telescope 2. """
+    tb = tp.foxsi4_position2_thermal_blanket(mid_energies) 
+    opt = tp.foxsi4_position2_optics(mid_energies, 
                               off_axis_angle=off_axis_angle) 
-    uni_al = tp.position2_uniform_al(mid_energies)
+    uni_al = tp.foxsi4_position2_uniform_al(mid_energies)
 
     arf = tb.transmissions * opt.effective_areas * uni_al.transmissions
 
@@ -58,25 +58,45 @@ def position2_arf(mid_energies, off_axis_angle):
                             mid_energies=mid_energies,
                             response=arf,
                             response_type="ARF",
-                            telescope="2",
+                            telescope="foxsi4-2",
                             elements=(tb, opt, uni_al),
                             )
 
-@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
-def position2_rmf(off_axis_angle):
-    """The RMF for position 2. """
-    rmf = tp.position2_detector_response(off_axis_angle) 
+@u.quantity_input(pitch=u.um)
+def foxsi4_telescope2_rmf(region:int=None, pitch=None, _side:str="merged", _event_type:str="all"):
+    """The RMF for telescope 2. """
+    
+    rmf = tp.foxsi4_position2_detector_response(region=region, 
+                                                pitch=pitch, 
+                                                _side=_side, 
+                                                _event_type=_event_type)
     func_name = sys._getframe().f_code.co_name
     rmf.update_function_path(func_name)
 
-    return
+    return Response2DOutput(filename="No-File",
+                            function_path=func_name,
+                            input_energy_edges=,
+                            output_energy_edges=,
+                            response=rmf.detector_response,
+                            response_type="RMF",
+                            telescope="foxsi4-2",
+                            elements=(rmf),
+                            )
+
+input_energy_edges: u.Quantity # photon axis
+    output_energy_edges: u.Quantity # count axis
+    response: u.Quantity
+    # bookkeeping
+    response_type: str
+    telescope: str
+    elements: tuple
 
 @u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin, time_range=u.second)
-def position2_response(mid_energies, off_axis_angle, time_range):
-    """The full response for position 2. """
-    atm = att_atmosphere(mid_energies=mid_energies, time_range=time_range)
-    arf = position2_arf(mid_energies=mid_energies, off_axis_angle=off_axis_angle)
-    rmf = position2_rmf(mid_energies=mid_energies, off_axis_angle=off_axis_angle)
+def foxsi4_telescope2_response(mid_energies, off_axis_angle, time_range):
+    """The full response for telescope 2. """
+    atm = att_foxsi4_atmosphere(mid_energies=mid_energies, time_range=time_range)
+    arf = foxsi4_telescope2_arf(mid_energies=mid_energies, off_axis_angle=off_axis_angle)
+    rmf = foxsi4_telescope2_rmf(mid_energies=mid_energies, off_axis_angle=off_axis_angle)
 
     total_response = (atm * arf)[:,None] * rmf
 
@@ -87,34 +107,34 @@ def position2_response(mid_energies, off_axis_angle, time_range):
 
     return 
 
-# position 3
+# telescope 3
 @u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
-def position3_arf(mid_energies, off_axis_angle=0<<u.arcmin):
+def foxsi4_telescope3_arf(mid_energies, off_axis_angle=0<<u.arcmin):
     logging.warning(f"The `off_axis_angle` input to  {sys._getframe().f_code.co_name} (value:{off_axis_angle}) is unused.")
-    return tp.position3_thermal_blanket(mid_energies) \
-           * tp.position3_optics(mid_energies) \
-           * tp.position3_al_mylar(mid_energies) \
-           * tp.position3_pixelated_attenuator(mid_energies)
+    return tp.foxsi4_position3_thermal_blanket(mid_energies) \
+           * tp.foxsi4_position3_optics(mid_energies) \
+           * tp.foxsi4_position3_al_mylar(mid_energies) \
+           * tp.foxsi4_position3_pixelated_attenuator(mid_energies)
 
-# position 4
+# telescope 4
 @u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
-def position4_arf(mid_energies, off_axis_angle=0<<u.arcmin):
+def foxsi4_telescope4_arf(mid_energies, off_axis_angle=0<<u.arcmin):
     logging.warning(f"The `off_axis_angle` input to  {sys._getframe().f_code.co_name} (value:{off_axis_angle}) is unused.")
-    return tp.position4_thermal_blanket(mid_energies) \
-           * tp.position4_optics(mid_energies) \
-           * tp.position4_uniform_al(mid_energies)
+    return tp.foxsi4_position4_thermal_blanket(mid_energies) \
+           * tp.foxsi4_position4_optics(mid_energies) \
+           * tp.foxsi4_position4_uniform_al(mid_energies)
 
-# position 5
+# telescope 5
 @u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
-def position5_arf(mid_energies, off_axis_angle=0<<u.arcmin):
-    return tp.position5_thermal_blanket(mid_energies) \
-           * tp.position5_optics(mid_energies, 
+def foxsi4_telescope5_arf(mid_energies, off_axis_angle=0<<u.arcmin):
+    return tp.foxsi4_position5_thermal_blanket(mid_energies) \
+           * tp.foxsi4_position5_optics(mid_energies, 
                                  off_axis_angle=off_axis_angle) \
-           * tp.position5_al_mylar(mid_energies) \
-           * tp.position5_pixelated_attenuator(mid_energies)
+           * tp.foxsi4_position5_al_mylar(mid_energies) \
+           * tp.foxsi4_position5_pixelated_attenuator(mid_energies)
 
 if __name__=="__main__":
     import numpy as np
     mid_energies = np.arange(3,30.1, 0.1) << u.keV
     off_axis_angle = 0 << u.arcmin
-    p2_arf = position2_arf(mid_energies=mid_energies, off_axis_angle=off_axis_angle)
+    p2_arf = telescope2_arf(mid_energies=mid_energies, off_axis_angle=off_axis_angle)
