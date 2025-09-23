@@ -116,8 +116,8 @@ def _get_oa_and_ea_msfc_10shell(grid):
     eff_areas = grid[1:]
     return off_axis_angles << u.arcmin, eff_areas << u.cm**2
 
-@u.quantity_input(mid_energies=u.keV)
-def eff_area_msfc_hi_res(mid_energies, position=None, use_model=False, file=None):
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def eff_area_msfc_hi_res(mid_energies, off_axis_angle=None, position=None, use_model=False, file=None):
     """MSCF hi-res effective areas interpolated to the given energies.
     
     This is the latest from Wayne.
@@ -134,6 +134,11 @@ def eff_area_msfc_hi_res(mid_energies, position=None, use_model=False, file=None
         `numpy.nan<<astropy.units.keV` is passed then an entry for all 
         native file energies are returned. 
         Unit must be convertable to keV.
+
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
 
     position : `int`
         The focal plane position of the desired optic. Must be in the
@@ -159,6 +164,8 @@ def eff_area_msfc_hi_res(mid_energies, position=None, use_model=False, file=None
         effective areas, and more. See accessible information using 
         `.contents` on the output.
     """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for MSFC high-resolution optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     # msfc_hi_res effective areas
     _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt") if file is None else file
     e, f1, f2, f3, f1_m, f2_m, f3_m = np.loadtxt(_f).T
@@ -246,8 +253,8 @@ def _eff_area_nagoya(mid_energies, file=None):
                          model=True,
                          )
 
-@u.quantity_input(mid_energies=u.keV)
-def eff_area_nagoya_hxt(mid_energies, use_model=False, file=None):
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def eff_area_nagoya_hxt(mid_energies, off_axis_angle=None, use_model=False, file=None):
     """Nagoya HXR hi-res effective areas interpolated to given energies.
 
     Parameters
@@ -257,6 +264,11 @@ def eff_area_nagoya_hxt(mid_energies, use_model=False, file=None):
         `numpy.nan<<astropy.units.keV` is passed then an entry for all 
         native file energies are returned. 
         Unit must be convertable to keV.
+
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
 
     use_model : `bool`
         Defines whether to use the measured values for the optic (False)
@@ -274,6 +286,8 @@ def eff_area_nagoya_hxt(mid_energies, use_model=False, file=None):
         effective areas, and more. See accessible information using 
         `.contents` on the output.
     """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for Nagoya high-resolution optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     # nagoya hxr effective areas
     if not use_model:
         _f = os.path.join(EFF_PATH, "nagoya_hxt_onaxis_measurement_v1.txt") if file is None else file

@@ -1,5 +1,6 @@
 """Wrappers for position aliases for more specific functions."""
 
+import logging
 import sys
 
 import astropy.units as u
@@ -172,8 +173,8 @@ def foxsi4_position3_thermal_blanket(mid_energies):
     r.update_function_path(sys._getframe().f_code.co_name)
     return r
 
-@u.quantity_input(mid_energies=u.keV)
-def foxsi4_position3_optics(mid_energies):
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def foxsi4_position3_optics(mid_energies, off_axis_angle=None):
     """Position 3 MSFC high resolution optic effective areas.
 
     Parameters
@@ -184,6 +185,11 @@ def foxsi4_position3_optics(mid_energies):
         native file energies are returned. 
         Unit must be convertable to keV.
 
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
+
     Returns
     -------
     : `effective_area.EffAreaOutput`
@@ -191,7 +197,10 @@ def foxsi4_position3_optics(mid_energies):
         high resolution optic. See accessible information using 
         `.contents` on the output.
     """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for Position 3's optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     r = eff_area_msfc_hi_res(mid_energies, 
+                             off_axis_angle=off_axis_angle,
                              position=3, 
                              use_model=True)
     r.update_function_path(sys._getframe().f_code.co_name)
@@ -322,8 +331,8 @@ def foxsi4_position4_thermal_blanket(mid_energies):
     r.update_function_path(sys._getframe().f_code.co_name)
     return r
 
-@u.quantity_input(mid_energies=u.keV)
-def foxsi4_position4_optics(mid_energies):
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def foxsi4_position4_optics(mid_energies, off_axis_angle=None):
     """Position 4 Nagoya high resolution optic effective areas.
 
     Parameters
@@ -334,6 +343,11 @@ def foxsi4_position4_optics(mid_energies):
         native file energies are returned. 
         Unit must be convertable to keV.
 
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
+
     Returns
     -------
     : `effective_area.EffAreaOutput`
@@ -341,7 +355,10 @@ def foxsi4_position4_optics(mid_energies):
         Nagoya high resolution optic. See accessible information using 
         `.contents` on the output.
     """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for Position 4's optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     r = eff_area_nagoya_hxt(mid_energies, 
+                            off_axis_angle=off_axis_angle,
                             use_model=True)
     r.update_function_path(sys._getframe().f_code.co_name)
     return r
