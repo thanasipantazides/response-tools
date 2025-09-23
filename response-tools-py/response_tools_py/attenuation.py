@@ -474,11 +474,7 @@ def att_foxsi4_atmosphere(mid_energies, time_range=None, file=None):
 
     _f = os.path.join(ATM_PATH, f"FOXSI4_atmospheric_transmission_v1.fits") if file is None else file
     with fits.open(_f) as hdul:
-        native_energies, transmission = (hdul[1].data[0][0]<<u.eV)<<u.keV, hdul[1].data[0][1]<<u.dimensionless_unscaled
-        # Need an array of times included
-        # -> 10,284 entries and t=0 is index `0` while t=100 is index `2000`
-        # -> final time is 100/2000 * 10284 = 514.2
-        native_times = np.linspace(0, 514.2, 10_284)<<u.second
+        native_times, native_energies, transmission = hdul[1].data["TIME"][0]<<u.second, (hdul[1].data["ENERGY"][0]<<u.eV)<<u.keV, hdul[1].data["ATMOSPHERIC_TRANS"][0]<<u.dimensionless_unscaled
 
         # assume some sort of uniform uniform binning
         en_res = np.mean(np.diff(native_energies))
