@@ -892,7 +892,7 @@ if __name__=="__main__":
     import matplotlib.pyplot as plt
     import numpy as np
 
-    save_asset = True
+    save_asset = False
 
     asset_response_chain_plot(save_asset=save_asset)
     asset_response_hit_combination_plot(save_asset=save_asset)
