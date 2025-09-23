@@ -89,7 +89,7 @@ def eff_area_msfc_10shell(mid_energies, off_axis_angle=0<<u.arcmin, optic_id=Non
 
     x, y = np.meshgrid(ea_energies, off_axis_angles_tilt)
     i = CloughTocher2DInterpolator(list(zip(x.flatten().value, y.flatten().value)), mean_eff_areas_areas.T.flatten().value)
-
+    
     mid_energies = native_resolution(native_x=ea_energies, input_x=mid_energies)
     off_axis_angle = native_resolution(native_x=off_axis_angles_tilt, input_x=off_axis_angle)
 

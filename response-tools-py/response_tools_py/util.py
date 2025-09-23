@@ -13,7 +13,7 @@ def native_resolution(native_x, input_x):
     The idea here is that if we want to improve/change the logic here 
     then we only have to do it here and not literally everywhere.
     """
-    return native_x if np.all(np.isnan(input_x)) else input_x
+    return native_x if np.all(np.isnan(input_x)) else input_x<<native_x.unit
 
 @dataclass
 class BaseOutput:

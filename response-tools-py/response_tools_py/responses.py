@@ -7,6 +7,7 @@ import pathlib
 import sys
 
 import astropy.units as u
+import numpy as np
 
 from response_tools_py.attenuation import att_foxsi4_atmosphere
 import response_tools_py.telescope_parts as tp
@@ -890,7 +891,6 @@ if __name__=="__main__":
     from matplotlib.colors import LogNorm
     import matplotlib.gridspec as gridspec
     import matplotlib.pyplot as plt
-    import numpy as np
 
     save_asset = False
 

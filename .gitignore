@@ -7,6 +7,7 @@ __pycache__/
 
 # Python
 response_tools_py.egg-info/
+build/
 
 # data directories
 response-information/attenuation-data/
