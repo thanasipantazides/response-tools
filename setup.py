@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="response_tools_py",
+    name="response_tools",
     version="0.0.1",
     description="Software used for the FOXSI response files.",
     url="https://github.com/foxsi/response-tools",

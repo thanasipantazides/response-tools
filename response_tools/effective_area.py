@@ -14,10 +14,10 @@ import numpy as np
 from scipy.interpolate import CloughTocher2DInterpolator
 import pandas
 
-from response_tools_py.util import BaseOutput, native_resolution
+from response_tools.util import BaseOutput, native_resolution
 
-EFF_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "effective-area-data")
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "eff-area-figs")
+EFF_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "effective-area-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "eff-area-figs")
 
 @dataclass
 class EffAreaOutput(BaseOutput):

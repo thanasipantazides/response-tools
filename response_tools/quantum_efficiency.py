@@ -10,10 +10,10 @@ from astropy.io import fits
 import astropy.units as u
 import numpy as np
 
-from response_tools_py.util import BaseOutput, native_resolution
+from response_tools.util import BaseOutput, native_resolution
 
-Q_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "quantum-efficiency-data")
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "quantum-eff-figs")
+Q_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "quantum-efficiency-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "quantum-eff-figs")
 
 @dataclass
 class QuantumEffOutput(BaseOutput):

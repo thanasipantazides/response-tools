@@ -6,7 +6,7 @@ __pycache__/
 .ipynb_checkpoints
 
 # Python
-response_tools_py.egg-info/
+response_tools.egg-info/
 build/
 
 # data directories

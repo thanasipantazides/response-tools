@@ -1,3 +1,3 @@
 # `response-tools`
 
-Please put tests spanning multiple languages in here.
+Please put Python tests in here.

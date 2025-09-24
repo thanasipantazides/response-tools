@@ -14,6 +14,6 @@ def load_yaml(filename):
 
     return file_info
 
-def load_cdte_context():
+def load_response_context():
     """Function to load in the context information from file. """
-    return load_yaml(os.path.join(pathlib.Path(__file__).parent, "..", "..", "..", "response-information", "info.yaml"))
+    return load_yaml(os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "info.yaml"))
