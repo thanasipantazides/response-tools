@@ -8,7 +8,7 @@ The chosen telescope for the example is Telescope 2 with photon path:
 - Thermal blanket -> Marshall 10-shell X-7 -> Al (0.015") -> CdTe4
 
 Mainly a quick example on unit aware objects and how to access the 
-returned dataclass objects.
+returned data-class objects.
 
 This example shows the use of nice high level functions that are tied to
 FOXSI-4 telescopes. 
@@ -128,13 +128,13 @@ object with `.value` or `.unit` as well. This can useful for axis labels
 when necessary.
 
 The output of `pos2_optics` (an `pos2_optics_new`) isn't just an array 
-now, it's a dataclass. The dataclass contains the effective areas of the 
-optics but also the energy, file, off-axis angle information used to 
+now, it's a data-class. The data-class contains the effective areas of 
+the optics but also the energy, file, off-axis angle information used to 
 produce it. This is crucial to track when there are a lot of files 
 flying around.
 
 As suggested in the "Output" section of the helpful documentation 
-earlier, we can see the contents of the dataclass and how to access the 
+earlier, we can see the contents of the data-class and how to access the 
 information within it:
 """
 
@@ -164,11 +164,28 @@ The above should produce something like:
  'model': False}
 ```
 
+The above might be a bit cumbersome and you may only wish to look at the
+data fields contained in the output. For this we can simply run:
+"""
+print(pos2_optics.fields)
+"""
+yielding something like:
+```
+['filename',
+ 'function_path',
+ 'mid_energies',
+ 'off_axis_angle',
+ 'effective_areas',
+ 'optic_id',
+ 'model']
+```
+which might be a bit easier to read.
+
 Note: there is a method called `print_contents()` you can use on the 
 function output that might format the contents a little nicer than the
 above you may wish to use.
 
-Each field can be accessed with the displayed name. For excample, to get
+Each field can be accessed with the displayed name. For example, to get
 the effective areas of the optics, simply:
 """
 
@@ -184,10 +201,11 @@ telescope to obtain the Ancillary Response Function (ARF),
 Redistribution Matrix Function (RMF), and/or Detector Response Matrix 
 (DRM).
 
-First, we can get the RMF for a telescope, say, Telescope 2:
+First, we can get the RMF for a telescope, say, Telescope 2 to be 
+consistent with using position 2's components previously:
 """
 
-pos2_rmf = responses.foxsi4_telescope2_rmf(region=0)
+tel2_rmf = responses.foxsi4_telescope2_rmf(region=0)
 
 """
 The `region` input refers to the different pitch regions across the CdTe
@@ -200,9 +218,9 @@ might as well access the RMF input energies for those energies we want
 the ARF values for:
 """
 
-mid_energies = (pos2_rmf.input_energy_edges[:-1]\
-                +pos2_rmf.input_energy_edges[1:])/2
-pos2_arf = responses.foxsi4_telescope2_arf(mid_energies=mid_energies, 
+mid_energies = (tel2_rmf.input_energy_edges[:-1]\
+                +tel2_rmf.input_energy_edges[1:])/2
+tel2_arf = responses.foxsi4_telescope2_arf(mid_energies=mid_energies, 
                                            off_axis_angle=0<<u.arcmin)
 
 """
@@ -211,20 +229,20 @@ just see what the total DRM is. This can be done by passing the ARF and
 RMF to the general `responses.foxsi4_telescope_response` function:
 """
 
-pos2_drm = responses.foxsi4_telescope_response(pos2_arf, pos2_rmf)
+tel2_drm = responses.foxsi4_telescope_response(tel2_arf, tel2_rmf)
 
 """
 Note that with the FOXSI-4 Telescope fucntions (`foxsi4_telescope*`), 
 there exists a field in the class called `elements`. This field contains
-all the dataclasses used to produce the objects `response` field.
+all the data-classes used to produce the objects `response` field.
 
 Checking the `elements` field for, say, the ARF object:
 """
 
-print(pos2_arf.elements)
+print(tel2_arf.elements)
 
 """
-We find that the `elements` field contains all the dataclasses that 
+We find that the `elements` field contains all the data-classes that 
 produced the Telescope 2 ARF such as the thermal blanket transmission 
 (dimensionless), the Marshall 10-shell X-7 optics effective areas 
 (cm**2), and the Al (0.015") attenuator transmissions (dimensionless).

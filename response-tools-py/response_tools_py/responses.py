@@ -51,6 +51,11 @@ def foxsi4_telescope_response(arf_response, rmf_response):
     combining both the ARF and RMF into the Detector Response Matrix 
     (DRM).
 
+    This function will check both the ARF and RMF have come from the 
+    same telescope using the "telescope" field. A warning will be 
+    produce if they are different to inform the user but the function 
+    will still output the product if possible.
+
     Parameters
     ----------
     arf_response : `responses.Response1DOutput`
@@ -70,7 +75,10 @@ def foxsi4_telescope_response(arf_response, rmf_response):
     # check compatibility
     rmf_mids = (rmf_response.input_energy_edges[:-1]+rmf_response.input_energy_edges[1:])/2
     if not np.all(arf_response.mid_energies==rmf_mids):
-        raise ValueError("The `arf_response.mid_energies` do not match the bin centers of `rmf_response.input_energy_edges`.\nDRM product cannot be calculated")
+        raise ValueError(f"In {sys._getframe().f_code.co_name}, the `arf_response.mid_energies` do not match the bin centers of `rmf_response.input_energy_edges`.\nDRM product cannot be calculated")
+    
+    if arf_response.telescope!=rmf_response.telescope:
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the \"telescope\" fields from `arf_response` ({arf_response.telescope}) and `rmf_response` ({rmf_response.telescope}) do not match.\nAn output shall be produced if possible (check the returned objects\"telescope\" field) but the user should be cautious.")
 
     total_response = arf_response.response[:,None] * rmf_response.response
 
@@ -84,7 +92,7 @@ def foxsi4_telescope_response(arf_response, rmf_response):
                             output_energy_edges=rmf_response.output_energy_edges,
                             response=total_response,
                             response_type="DRM",
-                            telescope="foxsi4-2",
+                            telescope=f"ARF:{arf_response.telescope},RMF{arf_response.telescope}",
                             elements=(arf_response,
                                       rmf_response,
                                       ),
@@ -132,7 +140,7 @@ def foxsi4_telescope2_arf(mid_energies, off_axis_angle):
                             mid_energies=mid_energies,
                             response=arf,
                             response_type="ARF",
-                            telescope="foxsi4-2",
+                            telescope="foxsi4-telescope2",
                             elements=(tb, 
                                       opt, 
                                       uni_al,
@@ -186,7 +194,7 @@ def foxsi4_telescope2_flight_arf(mid_energies, off_axis_angle, time_range):
                             mid_energies=mid_energies,
                             response=flight_arf,
                             response_type="ARF-flight",
-                            telescope=f"foxsi4-2",
+                            telescope=f"foxsi4-telescope2",
                             elements=(atm, 
                                       arf,
                                       ),
@@ -248,7 +256,7 @@ def foxsi4_telescope2_rmf(region:int=None, pitch=None, _side:str="merged", _even
                             output_energy_edges=rmf.output_energy_edges,
                             response=rmf.detector_response,
                             response_type="RMF",
-                            telescope="foxsi4-2",
+                            telescope="foxsi4-telescope2",
                             elements=(rmf,
                                       ),
                             )
@@ -299,7 +307,7 @@ def foxsi4_telescope3_arf(mid_energies, off_axis_angle=None):
                             mid_energies=mid_energies,
                             response=arf,
                             response_type="ARF",
-                            telescope="foxsi4-2",
+                            telescope="foxsi4-telescope3",
                             elements=(tb, 
                                       opt,
                                       mylar, 
@@ -357,7 +365,7 @@ def foxsi4_telescope3_flight_arf(mid_energies, time_range, off_axis_angle=None):
                             mid_energies=mid_energies,
                             response=flight_arf,
                             response_type="ARF-flight",
-                            telescope=f"foxsi4-3",
+                            telescope=f"foxsi4-telescope3",
                             elements=(atm, 
                                       arf,
                                       ),
@@ -419,7 +427,7 @@ def foxsi4_telescope3_rmf(region:int=None, pitch=None, _side:str="merged", _even
                             output_energy_edges=rmf.output_energy_edges,
                             response=rmf.detector_response,
                             response_type="RMF",
-                            telescope="foxsi4-3",
+                            telescope="foxsi4-telescope3",
                             elements=(rmf,
                                       ),
                             )
@@ -468,7 +476,7 @@ def foxsi4_telescope4_arf(mid_energies, off_axis_angle=None):
                             mid_energies=mid_energies,
                             response=arf,
                             response_type="ARF",
-                            telescope="foxsi4-4",
+                            telescope="foxsi4-telescope4",
                             elements=(tb, 
                                       opt, 
                                       uni_al,
@@ -525,7 +533,7 @@ def foxsi4_telescope4_flight_arf(mid_energies, time_range, off_axis_angle=None):
                             mid_energies=mid_energies,
                             response=flight_arf,
                             response_type="ARF-flight",
-                            telescope=f"foxsi4-4",
+                            telescope=f"foxsi4-telescope4",
                             elements=(atm, 
                                       arf,
                                       ),
@@ -587,7 +595,7 @@ def foxsi4_telescope4_rmf(region:int=None, pitch=None, _side:str="merged", _even
                             output_energy_edges=rmf.output_energy_edges,
                             response=rmf.detector_response,
                             response_type="RMF",
-                            telescope="foxsi4-4",
+                            telescope="foxsi4-telescope4",
                             elements=(rmf,
                                       ),
                             )
@@ -636,7 +644,7 @@ def foxsi4_telescope5_arf(mid_energies, off_axis_angle):
                             mid_energies=mid_energies,
                             response=arf,
                             response_type="ARF",
-                            telescope="foxsi4-5",
+                            telescope="foxsi4-telescope5",
                             elements=(tb, 
                                       opt, 
                                       mylar,
@@ -691,7 +699,7 @@ def foxsi4_telescope5_flight_arf(mid_energies, off_axis_angle, time_range):
                             mid_energies=mid_energies,
                             response=flight_arf,
                             response_type="ARF-flight",
-                            telescope=f"foxsi4-5",
+                            telescope=f"foxsi4-telescope5",
                             elements=(atm, 
                                       arf,
                                       ),
@@ -753,7 +761,7 @@ def foxsi4_telescope5_rmf(region:int=None, pitch=None, _side:str="merged", _even
                             output_energy_edges=rmf.output_energy_edges,
                             response=rmf.detector_response,
                             response_type="RMF",
-                            telescope="foxsi4-5",
+                            telescope="foxsi4-telescope5",
                             elements=(rmf,
                                       ),
                             )
