@@ -1,43 +1,196 @@
 """Code to load different detectro responses. """
 
+from dataclasses import dataclass
+
 import logging
 import os
 import pathlib
+import sys
 
 from astropy.io import fits
 import astropy.units as u
-from matplotlib.colors import LogNorm, Normalize
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
 import numpy as np
 
+from response_tools_py.util import BaseOutput
+
 DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "detector-response-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "det-resp-figs")
+
+@dataclass
+class DetectorResponseOutput(BaseOutput):
+    """Class for keeping track of effective area response values."""
+    # numbers
+    input_energy_edges: u.Quantity # photon axis
+    output_energy_edges: u.Quantity # count axis
+    detector_response: u.Quantity # rmf
+    # bookkeeping
+    detector: str
+    # any other fields needed can be added here
+    # can even add with a default so the input is not required for every other instance
 
 def cdte_det_resp_rmf(file):
-    """Return the redistribution matrix from a given file."""
+    """Return the redistribution matrix for CdTe from a given file.
+
+    Parameters
+    ----------
+    file : `str`
+        The file for the RMF.
+
+    Returns
+    -------
+    : `DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
     e_lo, e_hi, ngrp, fchan, nchan, matrix = _read_rmf(file)
 
     fchan_array = col2arr_py(fchan)
     nchan_array = col2arr_py(nchan)
 
-    return e_lo<<u.keV, e_hi<<u.keV, vrmf2arr_py(data=matrix,
-                                                 n_grp_list=ngrp,
-                                                 f_chan_array=fchan_array,
-                                                 n_chan_array=nchan_array)<<(u.ct/u.ph)
+    energies = np.append(e_lo, e_hi[-1])<<u.keV
+
+    return DetectorResponseOutput(filename=file,
+                                  function_path=f"{sys._getframe().f_code.co_name}",
+                                  input_energy_edges=energies,
+                                  output_energy_edges=energies,
+                                  detector_response=vrmf2arr_py(data=matrix,
+                                                                n_grp_list=ngrp,
+                                                                f_chan_array=fchan_array,
+                                                                n_chan_array=nchan_array)<<(u.ct/u.ph),
+                                  detector="CdTe-General-Detector-Response"
+                                  )
+
+@u.quantity_input(pitch=u.um)
+def cdte_det_resp(cdte:int=None, region:int=None, pitch=None, side:str="merged", event_type:str="all", file=None):
+    """Return the redistribution matrix for CdTe from a given file.
+
+    Requires the `cdte` input and _either_ `region` _xor_ `pitch`.
+
+    Wrapper for `cdte_det_resp_rmf` with bookkeeping.
+
+    Parameters
+    ----------
+    cdte : `int`
+        The CdTe detector number. Must be in [1,2,3,4].
+
+    region : `int`
+        The region of the CdTe detector required. Either provide 
+        `region` _xor_ `pitch`. The `region` maps onto the pitches used 
+        across the detector. 
+            Region 0 -> 60<<astropy.units.um 
+            Region 1 -> 80<<astropy.units.um
+            Region 2 -> 100<<astropy.units.um
+
+    pitch : `astropy.units.quantity.Quantity`
+        Instead of `region`, it might be more usefule to specify the 
+        pitch in physical units (must b convertable to 
+        `astropy.units.um`). Either provide `region` _xor_ `pitch`.
+        The pitches map onto the `region` input.
+            60<<astropy.units.um -> Region 0
+            80<<astropy.units.um -> Region 1
+            100<<astropy.units.um -> Region 2
+
+    side : `str`
+        Define the side on the detector the user requires the response 
+        from. Must be in ["pt", "merged"].
+        Default: "merged"
+
+    event_type : `str`
+        Define the type of event trigger being considered in the 
+        response. Must be in ["1hit", "2hit", ("all", "mix")]. 
+        Note: \"all\" and \"mix\" are the same but some from different 
+        naming conventions on the merged and individual detector sides. 
+        This will be fixed at some point in the future.
+        Default: "all"
+
+    file : `str`
+        The file for the RMF.
+
+    Returns
+    -------
+    : `DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+
+    have_region, have_pitch = (region is not None), (pitch is not None)
+    pitch2region = {60<<u.um:0, 80<<u.um:1, 100<<u.um:2}
+    valid_region, valid_pitch = (region in list(pitch2region.values())), (pitch in list(pitch2region.keys()))
+
+    if (cdte is None) or (cdte not in [1,2,3,4]):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, `cdte` must be given and in [1,2,3,4].")
+        return 
+    
+    if ((not have_region) and (not have_pitch)) \
+        or (have_region and have_pitch):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, either `region` [0,1,2] _xor_ `pitch` [60<<u.um,80<<u.um,100<<u.um] must be given.")
+        return 
+    
+    if have_region and (not valid_region):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `region` must be in [0,1,2].")
+        return 
+
+    if have_pitch and (not valid_pitch):
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `pitch` must be in [60<<u.um,80<<u.um,100<<u.um].")
+        return 
+    
+    if side not in ["pt", "merged"]:
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `side` must be in [\"pt\", \"merged\"].")
+        return 
+    
+    if event_type not in ["1hit", "2hit", "all", "mix"]:
+        logging.warning(f"In {sys._getframe().f_code.co_name}, the `event_type` must be in [\"1hit\", \"2hit\", (\"all\", \"mix\")].")
+        return 
+    
+    if side=="merged" and event_type=="mix":
+        event_type="all"
+    elif side in ["pt"] and event_type=="all":
+        event_type="mix"
+    
+    region = pitch2region[pitch] if have_pitch else region
+    
+    _f = os.path.join(DET_RESP_PATH, "cdte", side, f"Resp_3keVto30keV_CdTe{cdte}_reg{region}_{event_type}.rmf") if file is None else file
+    r = cdte_det_resp_rmf(_f)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    r.detector = f"CdTe{cdte}-Detector-Response"
+    return r
 
 def cmos_det_resp(file=None, telescope=None):
+    """Return the redistribution matrix for CMOS from a given file.
 
-    if telescope is None:
-        logging.warning("`telescope` input in cmos_det_resp()` must be 0 or 1.")
+    Parameters
+    ----------
+    file : `str`
+        The file for the RMF.
+
+    telescope : `int`
+        Either 0 or 1.
+
+    Returns
+    -------
+    : `DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+
+    if (telescope is None) or (telescope not in [0,1]):
+        logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
         
     _f = os.path.join(DET_RESP_PATH, 
                       "cmos", 
-                      f"foxsi4_telescope-{telescope}_BASIC_RESPONSE_MATRIX_V25APR13.fits") if file is None else file
+                      f"foxsi4_telescope-{telescope}_BASIC_RESPONSE_MATRIX_v1.fits") if file is None else file
     
     with fits.open(_f) as hdul:
-        matrix, counts, energy = hdul[1].data<<(u.ct/u.ph), hdul[2].data<<u.dimensionless_unscaled, hdul[3].data<<u.keV # units?
-    return counts, energy, matrix 
+        matrix, counts, energy = hdul[1].data<<(u.DN/u.ph), hdul[2].data<<u.DN, hdul[3].data<<u.keV # units?
+
+    return DetectorResponseOutput(filename=file,
+                                  function_path=f"{sys._getframe().f_code.co_name}",
+                                  input_energy_edges=energy,
+                                  output_energy_edges=counts,
+                                  detector_response=matrix,
+                                  detector=f"CMOS{telescope}-Detector-Response"
+                                  )
 
 def _read_rmf(file):
     """
@@ -232,79 +385,108 @@ def vrmf2arr_py(data=None, n_grp_list=None, f_chan_array=None, n_chan_array=None
 
     return mat_array_py
 
-
-if __name__=="__main__":
-
-    SAVE_ASSETS = False
-    assets_dir = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "det-resp-figs")
-    pathlib.Path(assets_dir).mkdir(parents=True, exist_ok=True)
-
+def asset_cmos_resp(save_asset=False):
     # CMOS
     fig = plt.figure(figsize=(12,7))
 
     gs = gridspec.GridSpec(1, 2)
     gs_ax0 = fig.add_subplot(gs[0, 0])
     telescope = 0
-    c, e, m = cmos_det_resp(file=None, telescope=telescope)
-    extent = [np.min(c.value), np.max(c.value), np.min(e.value), np.max(e.value)]
-    i = gs_ax0.imshow(m.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
+    cmos0_resp = cmos_det_resp(file=None, telescope=telescope)
+    extent = [np.min(cmos0_resp.output_energy_edges.value), 
+              np.max(cmos0_resp.output_energy_edges.value), 
+              np.min(cmos0_resp.input_energy_edges.value), 
+              np.max(cmos0_resp.input_energy_edges.value)]
+    i = gs_ax0.imshow(cmos0_resp.detector_response.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
     gs_ax0.set_ylim([0,10])
-    gs_ax0.set_xlabel("Counts?")
-    gs_ax0.set_ylabel(f"Energy? [{e.unit:latex}]")
+    gs_ax0.set_xlabel(f"Counts [{cmos0_resp.output_energy_edges.unit:latex}]")
+    gs_ax0.set_ylabel(f"Energy [{cmos0_resp.input_energy_edges.unit:latex}]")
     gs_ax0.set_title(f"CMOS{telescope}")
     cax = gs_ax0.inset_axes([0.1, 0.08, 0.8, 0.05],)
     cbar = fig.colorbar(i, cax=cax, orientation='horizontal')
-    cbar.set_label(f"{m.unit:latex}?", size=8, labelpad=0)
+    cbar.set_label(f"{cmos0_resp.detector_response.unit:latex}", size=8, labelpad=0)
     cax.tick_params(axis='both', which='major', labelsize=6)
 
 
     gs_ax1 = fig.add_subplot(gs[0, 1])
     telescope = 1
-    c, e, m = cmos_det_resp(file=None, telescope=telescope)
-    extent = [np.min(c.value), np.max(c.value), np.min(e.value), np.max(e.value)]
-    i = gs_ax1.imshow(m.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
+    cmos1_resp = cmos_det_resp(file=None, telescope=telescope)
+    extent = [np.min(cmos1_resp.output_energy_edges.value), 
+              np.max(cmos1_resp.output_energy_edges.value), 
+              np.min(cmos1_resp.input_energy_edges.value), 
+              np.max(cmos1_resp.input_energy_edges.value)]
+    i = gs_ax1.imshow(cmos1_resp.detector_response.value, origin="lower", aspect=(extent[1]-extent[0])/(extent[3]-extent[2]), extent=extent, norm=LogNorm())
     gs_ax1.set_ylim([0,10])
-    gs_ax1.set_xlabel("Counts?")
-    gs_ax1.set_ylabel(f"Energy? [{e.unit:latex}]")
+    gs_ax1.set_xlabel(f"Counts [{cmos1_resp.output_energy_edges.unit:latex}]")
+    gs_ax1.set_ylabel(f"Energy [{cmos1_resp.input_energy_edges.unit:latex}]")
     gs_ax1.set_title(f"CMOS{telescope}")
     cax = gs_ax1.inset_axes([0.1, 0.08, 0.8, 0.05],)
     cbar = fig.colorbar(i, cax=cax, orientation='horizontal')
-    cbar.set_label(f"{m.unit:latex}?", size=8, labelpad=0)
+    cbar.set_label(f"{cmos1_resp.detector_response.unit:latex}", size=8, labelpad=0)
     cax.tick_params(axis='both', which='major', labelsize=6)
 
     plt.tight_layout()
-    if SAVE_ASSETS:
-        plt.savefig(os.path.join(assets_dir,"cmos-response-matrices.png"), dpi=200, bbox_inches="tight")
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"cmos-response-matrices.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
+def asset_cdte_resp(save_asset=False):
     # CdTe
     d_rmf = os.path.join(DET_RESP_PATH, "cdte", "pt") 
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"
 
-
-    e_lo, e_hi, rmf = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
+    cdte_resp = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
 
     fig = plt.figure(figsize=(12, 5))
     gs = gridspec.GridSpec(1, 2)
 
     gs_ax0 = fig.add_subplot(gs[0, 0])
-    r = gs_ax0.imshow(rmf.value, origin="lower", norm=Normalize(vmin=0.001, vmax=0.12), extent=[np.min(e_lo.value), np.max(e_lo.value), np.min(e_lo.value), np.max(e_lo.value)])
+    r = gs_ax0.imshow(cdte_resp.detector_response.value, 
+                      origin="lower", 
+                      norm=Normalize(vmin=0.001, 
+                                     vmax=np.max(cdte_resp.detector_response.value)*0.9), 
+                      extent=[np.min(cdte_resp.output_energy_edges.value), 
+                              np.max(cdte_resp.output_energy_edges.value), 
+                              np.min(cdte_resp.input_energy_edges.value), 
+                              np.max(cdte_resp.input_energy_edges.value)]
+                      )
     cbar = plt.colorbar(r)
-    cbar.ax.set_ylabel('Counts photon$^{-1}$')
-    fig.suptitle(d_rmf+f_rmf)
-    gs_ax0.set_xlabel("Count Energy [keV]")
-    gs_ax0.set_ylabel("Photon Energy [keV]")
+    cbar.ax.set_ylabel(f"Response [{cdte_resp.detector_response.unit:latex}]")
+    gs_ax0.set_xlabel(f"Count Energy [{cdte_resp.output_energy_edges.unit:latex}]")
+    gs_ax0.set_ylabel(f"Photon Energy [{cdte_resp.input_energy_edges.unit:latex}]")
     gs_ax0.set_title("Linear Scale")
 
-    gs_ax0 = fig.add_subplot(gs[0, 1])
-    r = gs_ax0.imshow(rmf.value, origin="lower", norm=LogNorm(vmin=0.001, vmax=0.12), extent=[np.min(e_lo.value), np.max(e_lo.value), np.min(e_lo.value), np.max(e_lo.value)])
+    gs_ax1 = fig.add_subplot(gs[0, 1])
+    r = gs_ax1.imshow(cdte_resp.detector_response.value, 
+                      origin="lower", 
+                      norm=LogNorm(vmin=0.001, 
+                                   vmax=np.max(cdte_resp.detector_response.value)*0.9), 
+                      extent=[np.min(cdte_resp.output_energy_edges.value), 
+                              np.max(cdte_resp.output_energy_edges.value), 
+                              np.min(cdte_resp.input_energy_edges.value), 
+                              np.max(cdte_resp.input_energy_edges.value)]
+                      )
     cbar = plt.colorbar(r)
-    cbar.ax.set_ylabel('Counts photon$^{-1}$')
-    fig.suptitle(d_rmf+f_rmf)
-    gs_ax0.set_xlabel("Count Energy [keV]")
-    gs_ax0.set_ylabel("Photon Energy [keV]")
-    gs_ax0.set_title("Log Scale")
+    cbar.ax.set_ylabel(f"Response [{cdte_resp.detector_response.unit:latex}]")
+    gs_ax1.set_xlabel(f"Count Energy [{cdte_resp.output_energy_edges.unit:latex}]")
+    gs_ax1.set_ylabel(f"Photon Energy [{cdte_resp.input_energy_edges.unit:latex}]")
+    gs_ax1.set_title("Log Scale")
 
-    if SAVE_ASSETS:
-        plt.savefig(os.path.join(assets_dir,"cdte-response-matrix.png"), dpi=200, bbox_inches="tight")
+    fig.suptitle(f_rmf)
+
+    if save_asset:
+        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(ASSETS_PATH,"cdte-response-matrix.png"), dpi=200, bbox_inches="tight")
     plt.show()
+
+if __name__=="__main__":
+    from matplotlib.colors import LogNorm, Normalize
+    import matplotlib.gridspec as gridspec
+    import matplotlib.pyplot as plt
+
+    SAVE_ASSETS = False
+
+    asset_cdte_resp(save_asset=SAVE_ASSETS)
+    
+    asset_cmos_resp(save_asset=SAVE_ASSETS)
