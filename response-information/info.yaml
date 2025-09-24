@@ -1,5 +1,7 @@
----
-    files:
-        marshall 10-shell: ""
-        marshall 2-shell: "" 
-        nagoya 1-shell: ""
+files:
+  attenuation:
+    att_telescope-0_cmos_obfilter: "attenuation-data/foxsi4_telescope-0_BASIC_optical_blocking_filter_transmittance_v1.fits"
+
+# remote URL for fetching data.
+# can validly append any filename above to the server name to access.
+remote_server: "http://foxsi.space.umn.edu/data/response/response-components"
