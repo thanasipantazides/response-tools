@@ -46,8 +46,8 @@ Redistribution Matrix Function (RMF), and/or Detector Response Matrix
 (DRM).
 """
 
-import response_tools_py.responses as responses
-import response_tools_py.telescope_parts as telescope_parts
+import response_tools.responses as responses
+import response_tools.telescope_parts as telescope_parts
 
 """
 Let's look at the `foxsi4_position2_optics` function since we mentioned
@@ -57,7 +57,7 @@ always run:
 ```
 >>> help(telescope_parts.foxsi4_position2_optics)
 Help on function foxsi4_position2_optics in module 
-response_tools_py.telescope_parts:
+response_tools.telescope_parts:
 
 foxsi4_position2_optics(mid_energies, off_axis_angle)
     Position 2 MSFC heritage X-7 optic effective areas.

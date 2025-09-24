@@ -5,18 +5,18 @@ import sys
 
 import astropy.units as u
 
-from response_tools_py.attenuation import (att_thermal_blanket,
-                                           att_pixelated, 
-                                           att_al_mylar,
-                                           att_uniform_al_cdte
-                                           )
-from response_tools_py.detector_response import (cdte_det_resp, 
-                                                 cmos_det_resp,
-                                                 )
-from response_tools_py.effective_area import (eff_area_msfc_10shell,
-                                              eff_area_msfc_hi_res,
-                                              eff_area_nagoya_hxt,
+from response_tools.attenuation import (att_thermal_blanket,
+                                        att_pixelated, 
+                                        att_al_mylar,
+                                        att_uniform_al_cdte
+                                        )
+from response_tools.detector_response import (cdte_det_resp, 
+                                              cmos_det_resp,
                                               )
+from response_tools.effective_area import (eff_area_msfc_10shell,
+                                           eff_area_msfc_hi_res,
+                                           eff_area_nagoya_hxt,
+                                           )
 
 # position 2
 @u.quantity_input(mid_energies=u.keV)

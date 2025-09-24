@@ -9,11 +9,11 @@ import sys
 import astropy.units as u
 import numpy as np
 
-from response_tools_py.attenuation import att_foxsi4_atmosphere
-import response_tools_py.telescope_parts as tp
-from response_tools_py.util import BaseOutput
+from response_tools.attenuation import att_foxsi4_atmosphere
+import response_tools.telescope_parts as tp
+from response_tools.util import BaseOutput
 
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "response-figs")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "response-figs")
 
 @dataclass
 class Response1DOutput(BaseOutput):

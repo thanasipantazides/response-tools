@@ -13,11 +13,11 @@ import numpy as np
 import pandas
 import scipy
 
-from response_tools_py.util import BaseOutput, native_resolution
+from response_tools.util import BaseOutput, native_resolution
 
-ATT_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "attenuation-data")
-ATM_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "atmospheric-data")
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "att-figs")
+ATT_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "attenuation-data")
+ATM_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "atmospheric-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "att-figs")
 
 @dataclass
 class AttOutput(BaseOutput):

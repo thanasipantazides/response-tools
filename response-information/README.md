@@ -85,7 +85,7 @@ When a newer version of a file comes along, the text describing any old file can
   - _Origin:_ Uses [see Morgan]
   - _Version description:_
 - **Optics:** `"FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt"` (Marshall 2-shell X09/FM2)
-  - _Original file:_ `"FOXSI4_Effective_Areas_2025April11.txt"`[*](../response-tools-py/response_tools_py/aux)
+  - _Original file:_ `"FOXSI4_Effective_Areas_2025April11.txt"`[*](../response_tools/aux)
   - _Origin:_ `FOXSI`>`FOXSI-4 Flight 36.370`>`Flight Science`>`Response Work`>`Optics`>`msfc-hi-res`>`model-data-comparison`
   - _Version description:_
 - **Filter:** `"thin_mylar_p3_p5_theoretical_v1.csv"`
