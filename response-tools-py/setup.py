@@ -16,5 +16,5 @@ setuptools.setup(
             "pandas",
         ],
     packages=setuptools.find_packages(),
-    zip_safe=False
+    zip_safe=False,
 )
