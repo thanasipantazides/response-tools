@@ -11,10 +11,10 @@ from astropy.io import fits
 import astropy.units as u
 import numpy as np
 
-from response_tools_py.util import BaseOutput
+from response_tools.util import BaseOutput
 
-DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "response-information", "detector-response-data")
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "det-resp-figs")
+DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "detector-response-data")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "det-resp-figs")
 
 @dataclass
 class DetectorResponseOutput(BaseOutput):

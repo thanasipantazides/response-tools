@@ -26,7 +26,7 @@ from quantum_efficiency import qe_cmos
 
 def foxsi4_response_paths(save_assets=False):
     
-    assets_dir = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-py-figs", "response-paths")
+    assets_dir = os.path.join(pathlib.Path(__file__).parent, "..", "..", "assets", "response-tools-figs", "response-paths")
     pathlib.Path(assets_dir).mkdir(parents=True, exist_ok=True)
 
     plt.rcParams.update({'font.size': 7})

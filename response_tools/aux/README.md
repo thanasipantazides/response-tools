@@ -1,4 +1,4 @@
-# `response_tools_py.aux`
+# `response_tools.aux`
 
 A folder to contain any extra code/processes used for, say, formatting the files we have. Somewhere to document this stuff.
 

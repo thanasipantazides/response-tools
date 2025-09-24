@@ -6,6 +6,65 @@ Repository to manage response elements, originally for the FOXSI-4 sounding rock
 
 **Note:** Although this repositiory can be extanded to any other instrument (e.g., FOXSI-1, -2, and -3), this repository is only currently aimed for FOXSI-4 use.
 
+## `response-tools`
+
+A repository to software tools for the response system used for the FOXSI mission in Python (woo, Python). We will include helpful loader functions for the all the response elements and download clients to obtain the files.
+
+The tools being developed in Python should be placed in the `response_tools` folder (note the underscores and not dashes).
+
+There is an "examples" and a "tests" folder. The "examples" folder is a great place to include scripts that show how some of the code in the repository works and the "tests" folder is a fantastic place to put code that tests the tools that have been created.
+
+More information will be placed here with regards as to how this package is recommended to be used.
+
+## Install tips
+
+In order to work with some preliminary data, it is instructive to set up a virtual environment (more information below) and install necessary packages. The suggested way to do this is to create an environment with:
+
+- `conda create -n response-tools-env python==3.12`
+
+(recommend using Python 3.12 just because this has been proven to be stable with the software).
+
+The Python code can then be installed with:
+
+- `pip install -e .`
+
+while in this directory (the `response-tools` directory) containing the `setup.py` file.
+
+Any time the code is updated and, say, you pull it from Github, make sure to perform the `pip install -e .` line from above. This ensures any new changes, updated versions, etc. take effect.
+
+## Namespace
+
+The base `response_tools` namespace includes:
+
+- `~response_tools.contextResponseInfo`
+  - The information stored in a [YAML file](../response-information/info.yaml) that includes file version information (e.g., the current versions to be used) and can be accessed like a Python dictionary.
+- `~response_tools.__version__`
+  - The version of the code determined by `response-tools/setup.py`.
+    - `0.0.1`: First rendition of the code.
+
+### Examples using the namespace
+
+```python
+# importing the module is as easy as:
+>>> import response_tools
+
+# can access the YAML file contents in the code as 
+>>> print(response_tools.contextResponseInfo[""])
+...
+
+# then accessing the version as:
+>>> print(response_tools.__version__)
+'0.0.1'
+```
+
+## Useful Python tips
+
+Some useful things to keep in mind while using the Python code in this repository.
+
+### Virtual environments
+
+It might be a good idea to look into ([conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)) virtual environments if you are not familiar, this includes looking into them yourself or getting in touch with someone to help explain. This requires downloading [miniconda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) (or just conda if you prefer).
+
 ## Response files
 
 There are many response elements for FOXSI-4. Once downloaded, they can be places or found [here](./response-information/).
@@ -26,7 +85,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
-![Position 0 photon path](./assets/response-tools-py-figs/response-paths/Pos_0_CMOS_1_Response.png "Position 0 photon path")
+![Position 0 photon path](./assets/response-tools-figs/response-paths/Pos_0_CMOS_1_Response.png "Position 0 photon path")
 
 ### Position 1 (SXR, CMOS2)
 
@@ -37,7 +96,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
-![Position 1 photon path](./assets/response-tools-py-figs/response-paths/Pos_1_CMOS_2_Response.png "Position 1 photon path")
+![Position 1 photon path](./assets/response-tools-figs/response-paths/Pos_1_CMOS_2_Response.png "Position 1 photon path")
 
 ### Position 2 (HXR, CdTe4)
 
@@ -46,7 +105,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Filter:** ""
 - **Detector response:** ""
 
-![Position 2 photon path](./assets/response-tools-py-figs/response-paths/Pos_2_CdTe_4_Response.png "Position 2 photon path")
+![Position 2 photon path](./assets/response-tools-figs/response-paths/Pos_2_CdTe_4_Response.png "Position 2 photon path")
 
 ### Position 3 (HXR, CdTe2)
 
@@ -56,7 +115,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Pixelated attenuator:** ""
 - **Detector response:** ""
 
-![Position 3 photon path](./assets/response-tools-py-figs/response-paths/Pos_3_CdTe_2_Response.png "Position 3 photon path")
+![Position 3 photon path](./assets/response-tools-figs/response-paths/Pos_3_CdTe_2_Response.png "Position 3 photon path")
 
 ### Position 4 (HXR, CdTe3)
 
@@ -65,7 +124,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Filter:** ""
 - **Detector response:** ""
 
-![Position 4 photon path](./assets/response-tools-py-figs/response-paths/Pos_4_CdTe_3_Response.png "Position 4 photon path")
+![Position 4 photon path](./assets/response-tools-figs/response-paths/Pos_4_CdTe_3_Response.png "Position 4 photon path")
 
 ### Position 5 (HXR, CdTe1)
 
@@ -75,34 +134,17 @@ For a historical description of the response files below (old versions, etc.), s
 - **Pixelated attenuator:** ""
 - **Detector response:** ""
 
-![Position 5 photon path](./assets/response-tools-py-figs/response-paths/Pos_5_CdTe_1_Response.png "Position 5 photon path")
+![Position 5 photon path](./assets/response-tools-figs/response-paths/Pos_5_CdTe_1_Response.png "Position 5 photon path")
 
 ### Position 6 (Timepix)
 
 - N/A
 
-## Software and software help
-
-The repository may make use of multiple languages and each folder like `response-tools-???` hosts code in their respective languages relating to response tools. These include:
-
-- [`response-tools-py`](response-tools-py/) which contains Python code to download and read in the response files.
-  - The README in this directory also contains Python specific information & help
-
 ## Example code
 
 There are a few existing example scripts showing how to use a lot of tools in the repository.
 
-**Python examples:** Python example scripts can be found in response-tools-py [examples](response-tools-py/examples/) folder which has an associated [README file](response-tools-py/examples/README.md).
-
-## Repository Aim
-
-This repository will contain all code that proves useful in loading FOXSI response elements (at least from FOXSI-4). Several languages might be used and so the top level will be to contain language specific packages.
-
-For example, the `response-tools-py` folder will be a Python package containing all the necessary `.py` files. If other languages are to be included, like `IDL`, then a folder called `response-tools-idl` should be created and used to contain all the `IDL`-ness of the repository. This standard can be applied to the inclusion of other languages (e.g., C++ as `response-tools-cpp`, Shell code as `response-tools-shell`, etc.).
-
-Every `response-tools-<?>` folder should have an "examples" and a "tests" folder. The "examples" folder is a great place to include scripts that show how some of the code in the repository works and the "tests" folder is a fantastic place to put code that tests the tools that have been created.
-
-Additionally, there is also an "examples" and "tests" folder in the top level of the repository so there is a place for anything that fits these folders that spans across code from multiple languages.
+**Python examples:** Python example scripts can be found in response-tools [examples](response-tools/examples/) folder which has an associated [README file](response-tools/examples/README.md).
 
 ## Contributing to the repository
 
@@ -111,14 +153,6 @@ Thank you so much for considering to contribute to the repository! <span>&#12788
 In order to contribute, we ask that you first create your own fork of the repository and then clone that fork to your local machine. Branches of your new fork can be created to develop new features or fix bugs (exciting!). When you are happy with the code in that new branch, a pull request (PR) can be opened which aims to merge the code in your fork's branch into the `main` `foxsi/response-tools` repository. A lot of discussion can be facilitated in an open PR.
 
 **Note:** We aim to _never_ `push` from a local machine to this repository directly. If this happens then it can be very difficult for other contributers to understand what changes are being made and how it affects their own PRs. _If the repository is pushed to directly, in order to help track changes and make them visible to other contributers, the repository will be reverted back to it's state before the push and the undone changes will be asked to be proposed via a PR to then be merged._
-
-## The `external` directory
-
-The `external` directory is a place for software external to the repository. There is no guarentee that it will follow any specific coding language and so it would perhaps not be ideal to place it in a specific coding language `tools` directory. Some may be [`git` submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-
-To clone submodules when cloning the main repository, try the following:
-
-- `git clone --recurse-submodules https://github.com/foxsi/response-tools.git`
 
 ## The `response-information` directory
 

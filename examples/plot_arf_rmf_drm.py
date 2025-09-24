@@ -23,7 +23,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 
-import response_tools_py.responses as responses
+import response_tools.responses as responses
 
 fig = plt.figure(figsize=(18, 5))
 gs = gridspec.GridSpec(1, 3)
