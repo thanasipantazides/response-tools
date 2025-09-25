@@ -2,27 +2,18 @@
 Script to download data from FOXSI server.
 """
 
-import urllib.request
 import os, cmd, sys
+# from pathlib import PureWindowsPath, PurePosixPath
+import urllib.request
+from urllib.parse import urljoin
+from tqdm import tqdm
 from enum import Enum
+from response_tools.io.load_yaml import load_response_context
 import inquirer
-
-from bs4 import BeautifulSoup as bs
-from astropy.io import fits
 
 import pprint
 
-remote = "http://foxsi.space.umn.edu/data/response/response-components/"
 local_prefix = 'response-information'
-area_files = [
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/foxsi4_telescope-0_BASIC_mirror_effective_area_v1.fits",
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/foxsi4_telescope-1_BASIC_mirror_effective_area_v1.fits",
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/nagoya_hxt_onaxis_measurement_v1.txt",
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/nagoya_sxt_onaxis_measurement_v1.txt",
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt",
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/foxsi4_telescope-0_BASIC_TELESCOPE_RESPONSE_V25APR13.fits",
-    "http://foxsi.space.umn.edu/data/response/response-components/effective-area-data/foxsi4_telescope-1_BASIC_TELESCOPE_RESPONSE_V25APR13.fits"
-]
 
 ignore_urls = ['@eaDir/']
 
@@ -131,51 +122,103 @@ class DownloadPrompt:
         print(answers["file"])
 
 
+
+def green_str(text:str):
+    return "\033[92m" + text + "\033[0m"
+
+def foxsi4_download_required(replace_existing=False, verbose=False):
+    """Download all response component files specified in `response-information/info.yaml`.
+
+        Download data products from a remote server to the local filesystem. Retrieves server
+        URL and all local paths for saving data from a config file:
+        `response-tools/response-information/info.yaml`. All downloaded response data will be
+        saved under `response-tools/response-information`.
+    
+        Parameters
+        ----------
+        replace_existing : `bool`
+            Whether to replace local files with newer versions, if newer versions are
+            downloaded. Currently throws `NotImplementedError`.  
+
+        verbose : `bool`
+            Toggle for printing verbosely. If `True`, download progress indicators and
+            filenames are displayed. If `False`, nothing is printed at all.
+
+        Returns
+        -------    
+        : `downloaded`
+            A dict of downloaded data. Keys are the same file identifiers from the YAML
+            source. Values are the absolute paths on the local filesystem to the downloaded
+            file. Files which were already existed in the local filesystem (required no
+            downloaded) are not included in the return value.
+    """
+
+    if replace_existing == True:
+        raise NotImplementedError("No support yet for replacement of old file versions.")
+    
+    # print if the verbose flag is set:
+    def verbose_print(*something):
+        if verbose:
+            print(*something)
+
+    req = load_response_context()
+    server_url = req["remote_server"]
+    
+    # for urllib.parse.urljoin to work correctly, server path prefix must end in `/`:
+    if server_url[-1] != "/":
+        server_url += "/"
+    
+    # directory on local filesystem for saving data:
+    local_info_dir = os.path.abspath(os.path.join(__file__, "..", "..", "..", "response-information"))
+    verbose_print("Retrieving response products from:", green_str(server_url))
+    verbose_print("Saving response products to:", green_str(local_info_dir))
+
+    # record which files already exist on-disk (don't waste time downloading):
+    existing_files = []
+    for r,_,fs in os.walk(local_info_dir):
+        for f in fs:
+            existing_files.append(os.path.join(r,f))
+
+    desired_files = []      # list of the files to download
+    destination_path = []   # local path to save them to
+    source_name = []        # identifier of the file (YAML key)
+    do_get = []             # flag whether to download (if the file already exists locally)
+    
+    for comp_name in req["files"].keys():
+        for f_name, suffix in req["files"][comp_name].items():
+            desired_files.append(urljoin(server_url, suffix))
+            dest = os.path.join(local_info_dir, suffix)
+            destination_path.append(dest)
+            source_name.append(f_name)
+
+            if os.path.exists(dest):
+                do_get.append(False)
+            else:
+                do_get.append(True)
+
+    downloaded = {}
+    if any(do_get):
+        verbose_print("Retrieving files...")
+        for (k, f) in enumerate(tqdm(desired_files, disable=not verbose)):
+            if do_get[k]:
+                try:
+                    # create the folders along the save path, if needed
+                    os.makedirs(os.path.dirname(destination_path[k]))
+                except:
+                    pass
+                
+                # download the file:
+                fname, head = urllib.request.urlretrieve(f, destination_path[k])
+                # record the identifier and path of the downloaded file:
+                downloaded[source_name[k]] = fname
+                if verbose:
+                    tqdm.write("Downloaded " + green_str(os.path.basename(fname)))
+    else:
+        verbose_print("Found nothing new to download")
+    return downloaded
+
 if __name__ == "__main__":
-    DownloadPrompt()
-    # pprint.pprint(answers)
+    # DownloadPrompt()
 
-    # if answers["query"] == ""
-
-
-    # for file in area_files:
-    #     url_suffix = os.path.join(os.path.split(file)[-2], os.path.split(file)[-1])
-    #     url_dir_prefix, url_file = os.path.split(file)
-    #     _, url_dir = os.path.split(url_dir_prefix)
-
-    #     local_dest = os.path.abspath(os.path.join(__file__, '..', '..', '..', '..', local_prefix, url_dir, url_file))
-    #     if os.path.isfile(local_dest):
-    #         print_red('\talready have local copy of ' + url_file + ', skipping.')
-    #         continue
-
-    #     local_name, local_ext = os.path.splitext(local_dest)
-    #     local_ver = local_name.rsplit('v', 1)
-
-    #     print('found new file: ' + local_dest)
-    #     print_green('\tfound version: ' + local_ver[-1])
-    #     print_green('\t' + local_dest)
-
-    #     fname, head = urllib.request.urlretrieve(file, local_dest)
-    #     # d = f.read()
-
-    #     if os.path.splitext(fname) == '.fits':
-    #         with fits.open(fname) as hdul:
-    #             print(hdul.info())
-    #     elif os.path.splitext(fname) == '.csv':
-    #         print('a csv...')
-
-
-
-    # f = urllib.request.urlopen(remote)
-    # d = f.read()
-
-    # soup = bs(d, 'html.parser')
-    # print('reading page:', '\033[92m' + soup.title.string + '\033[0m ...')
-
-    # links = soup.find_all('a')  # select all HTML <a> tags
-    # print('found links:')
-    # for link in links:          # check each link
-    #     h = link.get('href')    # get the hyperref
-    #     if h[-1] == '/':        # find folders (end in `/`)
-    #         if h not in ignore_urls:    # ignore the ignorables
-    #             print_green('\t' + h)
+    downloaded = foxsi4_download_required(verbose=True)
+    pprint.pprint(downloaded)
