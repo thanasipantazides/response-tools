@@ -1,9 +1,9 @@
 files:
   optics:
     eff_area_telescope-2-pan_msfc_heritage: "effective-area-data/FOXSI3_Module_X-7_EA_pan_v1.txt"
-    eff_area_telescope-2-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-7_EA_pan_v1.txt"
+    eff_area_telescope-2-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-7_EA_tilt_v1.txt"
     eff_area_telescope-5-pan_msfc_heritage: "effective-area-data/FOXSI3_Module_X-8_EA_pan_v1.txt"
-    eff_area_telescope-5-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-8_EA_pan_v1.txt"
+    eff_area_telescope-5-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-8_EA_tilt_v1.txt"
     eff_area_msfc_hi_res: "effective-area-data/FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt"
     eff_area_nagoya_hxt: "effective-area-data/nagoya_hxt_onaxis_measurement_v1.txt"
     eff_area_nagoya_sxt: "effective-area-data/nagoya_sxt_onaxis_measurement_v1.txt"
