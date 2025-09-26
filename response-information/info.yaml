@@ -1,5 +1,35 @@
----
-    files:
-        marshall 10-shell: ""
-        marshall 2-shell: "" 
-        nagoya 1-shell: ""
+files:
+  optics:
+    eff_area_telescope-2-pan_msfc_heritage: "effective-area-data/FOXSI3_Module_X-7_EA_pan_v1.txt"
+    eff_area_telescope-2-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-7_EA_tilt_v1.txt"
+    eff_area_telescope-5-pan_msfc_heritage: "effective-area-data/FOXSI3_Module_X-8_EA_pan_v1.txt"
+    eff_area_telescope-5-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-8_EA_tilt_v1.txt"
+    eff_area_msfc_hi_res: "effective-area-data/FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt"
+    eff_area_nagoya_hxt: "effective-area-data/nagoya_hxt_onaxis_measurement_v1.txt"
+    eff_area_nagoya_sxt: "effective-area-data/nagoya_sxt_onaxis_measurement_v1.txt"
+
+  detectors:
+    cmos_det_telescope-0_resp: "detector-response-data/cmos/foxsi4_telescope-0_BASIC_RESPONSE_MATRIX_v1.fits"
+    cmos_det_telescope-1_resp: "detector-response-data/cmos/foxsi4_telescope-1_BASIC_RESPONSE_MATRIX_v1.fits"
+
+  attenuation:
+    att_thermal_blanket: "attenuation-data/F4_Blanket_transmission_v1.dat"
+    att_pixelated: "attenuation-data/20240607_fosxi4_transmission_v1.csv"
+    att_al_mylar: "attenuation-data/thin_mylar_p3_p5_theoretical_v1.csv"
+    att_telescope-2_uniform_al_cdte: "attenuation-data/unif_att_p2_theoretical_v1.csv"
+    att_telescope-4_uniform_al_cdte: "attenuation-data/unif_att_p4_theoretical_v1.csv"
+    att_telescope-0_collimator_ratio: "attenuation-data/foxsi4_telescope-0_BASIC_collimator_aperture_ratio_v1.fits"
+    att_telescope-1_collimator_ratio: "attenuation-data/foxsi4_telescope-1_BASIC_collimator_aperture_ratio_v1.fits"
+    att_telescope-0_cmos_obfilter: "attenuation-data/foxsi4_telescope-0_BASIC_optical_blocking_filter_transmittance_v1.fits"
+    att_telescope-1_cmos_obfilter: "attenuation-data/foxsi4_telescope-1_BASIC_optical_blocking_filter_transmittance_v1.fits"
+    att_telescope-0_cmos_prefilter: "attenuation-data/foxsi4_telescope-0_BASIC_attenuation_filter_transmittance_v1.fits"
+    att_telescope-1_cmos_prefilter: "attenuation-data/foxsi4_telescope-1_BASIC_attenuation_filter_transmittance_v1.fits"
+    att_foxsi4_atmosphere: "attenuation-data/FOXSI4_atmospheric_transmission_v1.fits"
+
+  quantum_efficiency:
+    qe_cmos_telescope-0: "quantum-efficiency-data/foxsi4_telescope-0_BASIC_sensor_quantum_efficiency_v1.fits"
+    qe_cmos_telescope-1: "quantum-efficiency-data/foxsi4_telescope-1_BASIC_sensor_quantum_efficiency_v1.fits"
+
+# remote URL for fetching data.
+# can validly append any filename above to the server name to access.
+remote_server: "http://foxsi.space.umn.edu/data/response/response-components"

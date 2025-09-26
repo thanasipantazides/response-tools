@@ -14,6 +14,8 @@ setuptools.setup(
             "astropy",
             "pytest",
             "pandas",
+            "beautifulsoup4",
+            "inquirer"
         ],
     packages=setuptools.find_packages(),
     zip_safe=False,

@@ -15,3 +15,7 @@ response-information/detector-response-data/
 response-information/effective-area-data/
 response-information/quantum-efficiency-data/
 response-information/atmospheric-data/
+
+# environment
+.env/
+.venv/
