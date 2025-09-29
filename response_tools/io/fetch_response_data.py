@@ -169,7 +169,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
         server_url += "/"
     
     # directory on local filesystem for saving data:
-    local_info_dir = os.path.abspath(os.path.join(__file__, "..", "..", "..", "response-information"))
+    local_info_dir = os.path.abspath(os.path.join(__file__, "..", "..", "response-information"))
     verbose_print("Retrieving response products from:", green_str(server_url))
     verbose_print("Saving response products to:", green_str(local_info_dir))
 

@@ -16,7 +16,7 @@ import pandas
 
 from response_tools.util import BaseOutput, native_resolution
 
-EFF_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "effective-area-data")
+EFF_PATH = os.path.join(pathlib.Path(__file__).parent, "response-information", "effective-area-data")
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "eff-area-figs")
 
 @dataclass
@@ -207,7 +207,7 @@ def _eff_area_msfc(mid_energies, file=None):
     # msfc_hi_res effective areas
     logging.warning(f"Caution: This might not be the function ({sys._getframe().f_code.co_name}) you are looking for, please see `eff_area_msfc_hi_res`.")
     logging.warning("This current function loads in some very early numbers for the new FOXSI-4 MSFC optics.")
-    _f = os.path.join(EFF_PATH, "3Inner_EA_EPDL97_14AA.csv") if file is None else file
+    _f = os.path.join(EFF_PATH, "3Inner_EA_EPDL97_14AA_v1.csv") if file is None else file
     msfc_hi_res = pandas.read_csv(_f).to_numpy()[:,1:] # remove the first column that only indexes
     # in cm2 ; we use the innermost and the 3rd innermost shells (S10 and S08) [from Yixian]
     msfc_hi_res_es, msfc_hi_res_effas08, msfc_hi_res_effas10 = msfc_hi_res[:,0] << u.keV, msfc_hi_res[:,1] << u.cm**2, msfc_hi_res[:,3] << u.cm**2 
@@ -234,7 +234,7 @@ def _eff_area_nagoya(mid_energies, file=None):
     # nagoya sxr effective areas
     logging.warning(f"Caution: This might not be the function ({sys._getframe().f_code.co_name}) you are looking for and has other effects included than just optics.")
     logging.warning("This current function loads in some very early numbers for the new FOXSI-4 Nagoya SXR optics.")
-    _f = os.path.join(EFF_PATH, "effective-area_raytracing_soft-xray-optic_on-axis.txt") if file is None else file
+    _f = os.path.join(EFF_PATH, "effective-area_raytracing_soft-xray-optic_on-axis_v1.txt") if file is None else file
     nagoya_sxr = np.loadtxt(_f)
     nagoya_sxr_es, nagoya_sxr_effa = nagoya_sxr[:,0] << u.keV, nagoya_sxr[:,1]/100 << u.cm**2
 

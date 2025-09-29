@@ -15,7 +15,7 @@ import scipy
 
 from response_tools.util import BaseOutput, native_resolution
 
-ATT_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "attenuation-data")
+ATT_PATH = os.path.join(pathlib.Path(__file__).parent, "response-information", "attenuation-data")
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "att-figs")
 
 @dataclass
@@ -223,7 +223,7 @@ def _att_old_prefilter(mid_energies, position=None, file=None):
     if (position is None) or (position not in [0,1]):
         logging.warning(f"The {sys._getframe().f_code.co_name} `position` must be 0 or 1.")
     logging.warning(f"Caution: This might not be the function you are looking for ({sys._getframe().f_code.co_name}), please see `att_cmos_obfilter`.")
-    _f = os.path.join(ATT_PATH, "CMOST_Prefilter_transmission.dat") if file is None else file
+    _f = os.path.join(ATT_PATH, "CMOST_Prefilter_transmission_v1.dat") if file is None else file
     att = scipy.io.readsav(_f)
     att_es, att_values = att["cmos_prefilter_transmission"]["energy_kev"][0] << u.keV, att["cmos_prefilter_transmission"][f"position{position}"][0] << u.dimensionless_unscaled
 

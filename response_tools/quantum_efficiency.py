@@ -12,7 +12,7 @@ import numpy as np
 
 from response_tools.util import BaseOutput, native_resolution
 
-Q_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "quantum-efficiency-data")
+Q_PATH = os.path.join(pathlib.Path(__file__).parent, "response-information", "quantum-efficiency-data")
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "quantum-eff-figs")
 
 @dataclass
