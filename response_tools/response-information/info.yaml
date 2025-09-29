@@ -6,7 +6,7 @@ files:
     eff_area_telescope-5-tilt_msfc_heritage: "effective-area-data/FOXSI3_Module_X-8_EA_tilt_v1.txt"
     eff_area_msfc_hi_res: "effective-area-data/FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt"
     eff_area_measured_nagoya_hxt: "effective-area-data/nagoya_hxt_onaxis_measurement_v1.txt"
-    eff_area_measured_sxt: "effective-area-data/nagoya_sxt_onaxis_measurement_v1.txt"
+    eff_area_measured_nagoya_sxt: "effective-area-data/nagoya_sxt_onaxis_measurement_v1.txt"
     eff_area_cmos_mirror0: "effective-area-data/foxsi4_telescope-0_BASIC_mirror_effective_area_v1.fits" 
     eff_area_cmos_mirror1: "effective-area-data/foxsi4_telescope-1_BASIC_mirror_effective_area_v1.fits"
     eff_area_cmos_telescope0: "effective-area-data/foxsi4_telescope-0_BASIC_TELESCOPE_RESPONSE_v1.fits" 
