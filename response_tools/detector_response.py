@@ -1,4 +1,4 @@
-"""Code to load different detectro responses. """
+"""Code to load different detector responses. """
 
 from dataclasses import dataclass
 
