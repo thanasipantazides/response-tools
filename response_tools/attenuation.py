@@ -13,10 +13,11 @@ import numpy as np
 import pandas
 import scipy
 
+import response_tools
 from response_tools.util import BaseOutput, native_resolution
 
-ATT_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "attenuation-data")
-ATM_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "atmospheric-data")
+FILE_PATH = response_tools.responseFilePath
+RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["attenuation"]
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "att-figs")
 
 @dataclass
@@ -57,7 +58,7 @@ def att_thermal_blanket(mid_energies, file=None):
         transmissions, and more. See accessible information using 
         `.contents` on the output.
     """
-    _f = os.path.join(ATT_PATH, "F4_Blanket_transmission_v1.dat") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["att_thermal_blanket"]) if file is None else file
     att = scipy.io.readsav(_f)
     att_es, att_values = att["energy_kev"] << u.keV, att["f4_transmission"] << u.dimensionless_unscaled
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
@@ -105,7 +106,7 @@ def att_uniform_al_cdte(mid_energies, position=None, file=None):
     """
     if (position is None) or (position not in [2,4]):
         logging.warning(f"The {sys._getframe().f_code.co_name} `position` must be 2 or 4.")
-    _f = os.path.join(ATT_PATH, f"unif_att_p{position}_theoretical_v1.csv") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"att_telescope-{position}_uniform_al_cdte"]) if file is None else file
     att = pandas.read_csv(_f)
     att_es, att_values = att["energy[keV]"] << u.keV, att["transmission"] << u.dimensionless_unscaled
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
@@ -151,7 +152,7 @@ def att_pixelated(mid_energies, use_model=False, file=None):
         transmissions, and more. See accessible information using 
         `.contents` on the output.
     """
-    _f = os.path.join(ATT_PATH, "20240607_fosxi4_transmission_v1.csv") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["att_pixelated"]) if file is None else file
     att = pandas.read_csv(_f)
     att_es, att_values_measured, att_values_modelled = att["energy"] << u.keV, att["measured_transmission"] << u.dimensionless_unscaled, att["modeled_transmission"] << u.dimensionless_unscaled
 
@@ -197,7 +198,7 @@ def att_al_mylar(mid_energies, file=None):
         transmissions, and more. See accessible information using 
         `.contents` on the output.
     """
-    _f = os.path.join(ATT_PATH, "thin_mylar_p3_p5_theoretical_v1.csv") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["att_al_mylar"]) if file is None else file
     att = pandas.read_csv(_f)
     att_es, att_values = att["energy[keV]"] << u.keV, att["transmission"] << u.dimensionless_unscaled
     mid_energies = native_resolution(native_x=att_es, input_x=mid_energies)
@@ -224,7 +225,7 @@ def _att_old_prefilter(mid_energies, position=None, file=None):
     if (position is None) or (position not in [0,1]):
         logging.warning(f"The {sys._getframe().f_code.co_name} `position` must be 0 or 1.")
     logging.warning(f"Caution: This might not be the function you are looking for ({sys._getframe().f_code.co_name}), please see `att_cmos_obfilter`.")
-    _f = os.path.join(ATT_PATH, "CMOST_Prefilter_transmission.dat") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["att_early_cmos_prefilter"]) if file is None else file
     att = scipy.io.readsav(_f)
     att_es, att_values = att["cmos_prefilter_transmission"]["energy_kev"][0] << u.keV, att["cmos_prefilter_transmission"][f"position{position}"][0] << u.dimensionless_unscaled
 
@@ -304,7 +305,7 @@ def att_cmos_filter(mid_energies, telescope=None, file=None):
     if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
-    _f = os.path.join(ATT_PATH, f"foxsi4_telescope-{telescope}_BASIC_attenuation_filter_transmittance_v1.fits") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"att_telescope-{telescope}_cmos_prefilter"]) if file is None else file
     with fits.open(_f) as hdul:
         es, t = hdul[2].data << u.keV, hdul[1].data << u.dimensionless_unscaled
     mid_energies = native_resolution(native_x=es, input_x=mid_energies)
@@ -352,7 +353,7 @@ def att_cmos_obfilter(mid_energies, telescope=None, file=None):
     if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
-    _f = os.path.join(ATT_PATH, f"foxsi4_telescope-{telescope}_BASIC_optical_blocking_filter_transmittance_v1.fits") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"att_telescope-{telescope}_cmos_obfilter"]) if file is None else file
     with fits.open(_f) as hdul:
         es, t = hdul[2].data << u.keV, hdul[1].data << u.dimensionless_unscaled
     mid_energies = native_resolution(native_x=es, input_x=mid_energies)
@@ -399,7 +400,7 @@ def att_cmos_collimator_ratio(off_axis_angle, telescope=None, file=None):
     if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
-    _f = os.path.join(ATT_PATH, f"foxsi4_telescope-{telescope}_BASIC_collimator_aperture_ratio_v1.fits") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"att_telescope-{telescope}_collimator_ratio"]) if file is None else file
     with fits.open(_f) as hdul:
         oa_angles, aperture_ratio = hdul[2].data << u.arcmin, hdul[1].data << u.dimensionless_unscaled
     off_axis_angle = native_resolution(native_x=oa_angles, input_x=off_axis_angle)
@@ -472,7 +473,7 @@ def att_foxsi4_atmosphere(mid_energies, time_range=None, file=None):
         warnings.warn(f"{sys._getframe().f_code.co_name} `time_range` (convertable to astropy.units.seconds) should be of length 2.")
         return
 
-    _f = os.path.join(ATM_PATH, f"FOXSI4_atmospheric_transmission_v1.fits") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["att_foxsi4_atmosphere"]) if file is None else file
     with fits.open(_f) as hdul:
         native_times, native_energies, transmission = hdul[1].data["TIME"][0]<<u.second, (hdul[1].data["ENERGY"][0]<<u.eV)<<u.keV, hdul[1].data["ATMOSPHERIC_TRANS"][0]<<u.dimensionless_unscaled
 
