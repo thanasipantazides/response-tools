@@ -15,7 +15,9 @@ setuptools.setup(
             "pytest",
             "pandas",
             "beautifulsoup4",
-            "inquirer"
+            "inquirer",
+            "tqdm",
+            "requests",
         ],
     packages=setuptools.find_packages(),
     zip_safe=False,

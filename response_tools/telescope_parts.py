@@ -608,7 +608,7 @@ def foxsi4_position5_detector_response(region:int=None, pitch=None, _side:str="m
 if __name__=="__main__":
     # mid_energies = [4.5,  5.5,  6.5,  7.5,  8.5,  9.5, 11. , 13. , 15. , 17. , 19. , 22.5, 27.5] << u.keV
     # p2_tb = position2_thermal_blanket(mid_energies)
-    p2_dr_reg = position2_detector_response(region=0)
-    p2_dr_pitch = position2_detector_response(pitch=60<<u.um)
-    position2_detector_response(region=0, pitch=60<<u.um)
-    position2_detector_response(pitch=80<<u.um, _side="merged", _event_type="1hit")
+    p2_dr_reg = foxsi4_position2_detector_response(region=0)
+    p2_dr_pitch = foxsi4_position2_detector_response(pitch=60<<u.um)
+    foxsi4_position2_detector_response(region=0, pitch=60<<u.um)
+    foxsi4_position2_detector_response(pitch=80<<u.um, _side="merged", _event_type="1hit")

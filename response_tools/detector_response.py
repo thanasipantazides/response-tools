@@ -1,4 +1,4 @@
-"""Code to load different detectro responses. """
+"""Code to load different detector responses. """
 
 from dataclasses import dataclass
 
@@ -16,7 +16,6 @@ from response_tools.util import BaseOutput
 
 FILE_PATH = response_tools.responseFilePath
 RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["detectors"]
-DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "response-information", "detector-response-data")
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "det-resp-figs")
 
 @dataclass
@@ -152,7 +151,9 @@ def cdte_det_resp(cdte:int=None, region:int=None, pitch=None, side:str="merged",
     
     region = pitch2region[pitch] if have_pitch else region
     
-    _f = os.path.join(DET_RESP_PATH, "cdte", side, f"Resp_3keVto30keV_CdTe{cdte}_reg{region}_{event_type}.rmf") if file is None else file
+    _f = os.path.join(FILE_PATH, 
+                      RESPONSE_INFO_TYPE[f"cdte_det_{side}_resp"], 
+                      f"Resp_3keVto30keV_CdTe{cdte}_reg{region}_{event_type}.rmf") if file is None else file
     r = cdte_det_resp_rmf(_f)
     r.update_function_path(sys._getframe().f_code.co_name)
     r.detector = f"CdTe{cdte}-Detector-Response"
@@ -434,7 +435,7 @@ def asset_cmos_resp(save_asset=False):
 
 def asset_cdte_resp(save_asset=False):
     # CdTe
-    d_rmf = os.path.join(DET_RESP_PATH, "cdte", "pt") 
+    d_rmf = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"cdte_det_pt_resp"])
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"
 
     cdte_resp = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))

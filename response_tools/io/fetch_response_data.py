@@ -3,15 +3,18 @@ Script to download data from FOXSI server.
 """
 
 import os, cmd, sys
+import pprint
 # from pathlib import PureWindowsPath, PurePosixPath
+
+from bs4 import BeautifulSoup
+from enum import Enum
+import inquirer
+import requests
+from tqdm import tqdm
 import urllib.request
 from urllib.parse import urljoin
-from tqdm import tqdm
-from enum import Enum
-from response_tools.io.load_yaml import load_response_context
-import inquirer
 
-import pprint
+from response_tools.io.load_yaml import load_response_context
 
 local_prefix = 'response-information'
 
@@ -200,19 +203,34 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     if any(do_get):
         verbose_print("Retrieving files...")
         for (k, f) in enumerate(tqdm(desired_files, disable=not verbose)):
+
             if do_get[k]:
                 try:
                     # create the folders along the save path, if needed
                     os.makedirs(os.path.dirname(destination_path[k]))
                 except:
                     pass
-                
-                # download the file:
-                fname, head = urllib.request.urlretrieve(f, destination_path[k])
+
+                # check if the URL ends in "/" which indicates a folder
+                if f.endswith("/"):
+                    # get the contents of the folder
+                    page = requests.get(f).text
+                    soup = BeautifulSoup(page, 'html.parser')
+                    # make sure we extract all the hrefs then check the link has a "." in it for an extension
+                    linked_files = [node.get('href') for node in soup.find_all('a') if ("." in node.get('href'))]
+                    # just download the folder contents
+                    for link in linked_files:
+                        urllib.request.urlretrieve(f+link, os.path.join(destination_path[k], link))
+                    downloaded[source_name[k]] = f
+                    green_name = f
+                else:
+                    # download the file:
+                    fname, head = urllib.request.urlretrieve(f, destination_path[k])
+                    green_name = os.path.basename(fname)
                 # record the identifier and path of the downloaded file:
                 downloaded[source_name[k]] = fname
                 if verbose:
-                    tqdm.write("Downloaded " + green_str(os.path.basename(fname)))
+                    tqdm.write("Downloaded " + green_str(green_name))
     else:
         verbose_print("Found nothing new to download")
     return downloaded
