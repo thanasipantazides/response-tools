@@ -9,16 +9,19 @@ import warnings
 
 from astropy.io import fits
 import astropy.units as u
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 import pandas
 import scipy
 
 import response_tools
+from response_tools.phot_spec import create_energy_midpoints, zeroes2nans
 from response_tools.util import BaseOutput, native_resolution
 
 FILE_PATH = response_tools.responseFilePath
 RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["attenuation"]
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "att-figs")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "assets", "response-tools-figs", "att-figs")
 
 @dataclass
 class AttOutput(BaseOutput):
@@ -544,7 +547,7 @@ def att_foxsi4_atmosphere(mid_energies, time_range=None, file=None):
                      model=True,
                      )
 
-def asset_att(save_asset=False):
+def asset_att(save_location=None):
     mid_energies = create_energy_midpoints()
 
     tb_col, obf0_col, obf1_col, cdte_fixed2_col, cdte_fixed4_col = plt.cm.viridis([0, 0.2, 0.4, 0.6, 0.8])
@@ -599,12 +602,12 @@ def asset_att(save_asset=False):
     
     plt.legend(handles=p1+p2+p3+p4+p5+p6+p7+p8+p9+p10+p11+p12)
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"transmissions.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"transmissions.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_sigmoid(save_asset=False):
+def asset_sigmoid(save_location=None):
     mid_energies = create_energy_midpoints()
 
     plt.figure(figsize=(10,8))
@@ -638,12 +641,12 @@ def asset_sigmoid(save_asset=False):
 
     plt.legend(handles=p1+p2+p3+p4+p5+p6+p7+p8)
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"model-transmissions.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"model-transmissions.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_atm(save_asset=False):
+def asset_atm(save_location=None):
     fig = plt.figure(figsize=(16,6))
 
     obs_start = 100
@@ -733,26 +736,21 @@ def asset_atm(save_asset=False):
     plt.suptitle("FOXSI-4 Flight Atmospheric Transmission")
 
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"atmospheric-transmissions.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"atmospheric-transmissions.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 if __name__=="__main__":
-    import matplotlib.pyplot as plt
-    import matplotlib.gridspec as gridspec
-
-    from phot_spec import create_energy_midpoints, zeroes2nans
-
-    SAVE_ASSETS = False
+    save_location = None # ASSETS_PATH
     
-    asset_att(save_asset=SAVE_ASSETS)
+    asset_att(save_location=save_location)
     
     ## other
     # collimator (so far, only have value for on-axis)
     print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=0).transmissions)
     print(att_cmos_collimator_ratio(0<<u.arcsec, file=None, telescope=1).transmissions)
 
-    asset_sigmoid(save_asset=SAVE_ASSETS)
+    asset_sigmoid(save_location=save_location)
 
-    asset_atm(save_asset=SAVE_ASSETS)
+    asset_atm(save_location=save_location)

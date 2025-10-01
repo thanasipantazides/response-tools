@@ -37,7 +37,7 @@ Any time the code is updated and, say, you pull it from Github, make sure to per
 The base `response_tools` namespace includes:
 
 - `~response_tools.contextResponseInfo`
-  - The information stored in a [YAML file](../response-information/info.yaml) that includes file version information (e.g., the current versions to be used) and can be accessed like a Python dictionary.
+  - The information stored in a [YAML file](./response_tools/response-information/info.yaml) that includes file version information (e.g., the current versions to be used) and can be accessed like a Python dictionary.
 - `~response_tools.__version__`
   - The version of the code determined by `response-tools/setup.py`.
     - `0.0.1`: First rendition of the code.
@@ -55,6 +55,9 @@ The base `response_tools` namespace includes:
 # then accessing the version as:
 >>> print(response_tools.__version__)
 '0.0.1'
+
+>>> print(response_tools.responseFilePath)
+'/path/to/response/file/download/location/'
 ```
 
 ## Useful Python tips
@@ -67,13 +70,13 @@ It might be a good idea to look into ([conda](https://conda.io/projects/conda/en
 
 ## Response files
 
-There are many response elements for FOXSI-4. Once downloaded, they can be places or found [here](./response-information/).
+There are many response elements for FOXSI-4. Once downloaded, they can be places or found [here](./response_tools/response-information/).
 
 We can describe various aspect like versioned filename (official one to use), original filename, description, etc.
 
 We can group them in which telescope they belonged to in FOXSI-4 and order them with regards to the photon path. This list should be kept up-to-date.
 
-For a historical description of the response files below (old versions, etc.), see the [README in response-information](./response-information/README.md).
+For a historical description of the response files below (old versions, etc.), see the [README in response-information](./response_tools/response-information/README.md).
 
 ### Position 0 (SXR, CMOS1)
 
@@ -85,7 +88,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
-![Position 0 photon path](./assets/response-tools-figs/response-paths/Pos_0_CMOS_1_Response.png "Position 0 photon path")
+![Position 0 photon path](./response_tools/assets/response-tools-figs/response-paths/Pos_0_CMOS_1_Response.png "Position 0 photon path")
 
 ### Position 1 (SXR, CMOS2)
 
@@ -96,7 +99,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Detector response:** ""
   - **Quantum efficiency:** ""
 
-![Position 1 photon path](./assets/response-tools-figs/response-paths/Pos_1_CMOS_2_Response.png "Position 1 photon path")
+![Position 1 photon path](./response_tools/assets/response-tools-figs/response-paths/Pos_1_CMOS_2_Response.png "Position 1 photon path")
 
 ### Position 2 (HXR, CdTe4)
 
@@ -105,7 +108,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Filter:** ""
 - **Detector response:** ""
 
-![Position 2 photon path](./assets/response-tools-figs/response-paths/Pos_2_CdTe_4_Response.png "Position 2 photon path")
+![Position 2 photon path](./response_tools/assets/response-tools-figs/response-paths/Pos_2_CdTe_4_Response.png "Position 2 photon path")
 
 ### Position 3 (HXR, CdTe2)
 
@@ -115,7 +118,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Pixelated attenuator:** ""
 - **Detector response:** ""
 
-![Position 3 photon path](./assets/response-tools-figs/response-paths/Pos_3_CdTe_2_Response.png "Position 3 photon path")
+![Position 3 photon path](./response_tools/assets/response-tools-figs/response-paths/Pos_3_CdTe_2_Response.png "Position 3 photon path")
 
 ### Position 4 (HXR, CdTe3)
 
@@ -124,7 +127,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Filter:** ""
 - **Detector response:** ""
 
-![Position 4 photon path](./assets/response-tools-figs/response-paths/Pos_4_CdTe_3_Response.png "Position 4 photon path")
+![Position 4 photon path](./response_tools/assets/response-tools-figs/response-paths/Pos_4_CdTe_3_Response.png "Position 4 photon path")
 
 ### Position 5 (HXR, CdTe1)
 
@@ -134,7 +137,7 @@ For a historical description of the response files below (old versions, etc.), s
 - **Pixelated attenuator:** ""
 - **Detector response:** ""
 
-![Position 5 photon path](./assets/response-tools-figs/response-paths/Pos_5_CdTe_1_Response.png "Position 5 photon path")
+![Position 5 photon path](./response_tools/assets/response-tools-figs/response-paths/Pos_5_CdTe_1_Response.png "Position 5 photon path")
 
 ### Position 6 (Timepix)
 
@@ -144,7 +147,7 @@ For a historical description of the response files below (old versions, etc.), s
 
 There are a few existing example scripts showing how to use a lot of tools in the repository.
 
-**Python examples:** Python example scripts can be found in response-tools [examples](response-tools/examples/) folder which has an associated [README file](response-tools/examples/README.md).
+**Python examples:** Python example scripts can be found in response-tools [examples](./examples/) folder which has an associated [README file](./examples/README.md).
 
 ## Contributing to the repository
 

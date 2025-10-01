@@ -7,13 +7,16 @@ import pathlib
 import sys
 
 import astropy.units as u
+from matplotlib.colors import LogNorm
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 import numpy as np
 
 from response_tools.attenuation import att_foxsi4_atmosphere
 import response_tools.telescope_parts as tp
 from response_tools.util import BaseOutput
 
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "response-figs")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "assets", "response-tools-figs", "response-figs")
 
 @dataclass
 class Response1DOutput(BaseOutput):
@@ -92,7 +95,7 @@ def foxsi4_telescope_response(arf_response, rmf_response):
                             output_energy_edges=rmf_response.output_energy_edges,
                             response=total_response,
                             response_type="DRM",
-                            telescope=f"ARF:{arf_response.telescope},RMF{arf_response.telescope}",
+                            telescope=f"ARF:{arf_response.telescope},RMF:{arf_response.telescope}",
                             elements=(arf_response,
                                       rmf_response,
                                       ),
@@ -766,7 +769,7 @@ def foxsi4_telescope5_rmf(region:int=None, pitch=None, _side:str="merged", _even
                                       ),
                             )
 
-def asset_response_chain_plot(save_asset=False):
+def asset_response_chain_plot(save_location=None):
     """Plot the response chain data to visually check."""
     pos2arffunc = {2:foxsi4_telescope2_arf, 
                    3:foxsi4_telescope3_arf, 
@@ -826,12 +829,12 @@ def asset_response_chain_plot(save_asset=False):
         gs_ax2.set_ylabel(f"Photon Energy [{pos_drm.input_energy_edges.unit:latex}]")
         gs_ax2.set_title(f"Pos. {key}: DRM")
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"response-chain.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"response-chain.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_response_hit_combination_plot(save_asset=False):
+def asset_response_hit_combination_plot(save_location=None):
     """Look at different combinations of the 1hit and 2hit responses."""
     p5_rmf1 = foxsi4_telescope5_rmf(region=0, _event_type="1hit")
     p5_rmf2 = foxsi4_telescope5_rmf(region=0, _event_type="2hit")
@@ -890,17 +893,12 @@ def asset_response_hit_combination_plot(save_asset=False):
     gs_ax2.set_ylabel(f"Photon Energy [{p5_rmf1.input_energy_edges.unit:latex}]")
     gs_ax2.set_title(f"Pos. 5: RMF-({h1f}*1hit+{h2f}*2hit)")
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"response-hit-combinations.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"response-hit-combinations.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 if __name__=="__main__":
-    from matplotlib.colors import LogNorm
-    import matplotlib.gridspec as gridspec
-    import matplotlib.pyplot as plt
-
-    save_asset = False
-
-    asset_response_chain_plot(save_asset=save_asset)
-    asset_response_hit_combination_plot(save_asset=save_asset)
+    save_location = None # ASSETS_PATH
+    asset_response_chain_plot(save_location=save_location)
+    asset_response_hit_combination_plot(save_location=save_location)
