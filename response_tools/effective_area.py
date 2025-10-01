@@ -14,9 +14,11 @@ import numpy as np
 from scipy.interpolate import CloughTocher2DInterpolator
 import pandas
 
+import response_tools
 from response_tools.util import BaseOutput, native_resolution
 
-EFF_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "effective-area-data")
+FILE_PATH = response_tools.responseFilePath
+RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["optics"]
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "eff-area-figs")
 
 @dataclass
@@ -73,7 +75,7 @@ def eff_area_msfc_10shell(mid_energies, off_axis_angle=0<<u.arcmin, optic_id=Non
     """
     _id = optic_id if optic_id in ["X-7", "X-8"] else None
     if _id is None:
-        logging.warning("Please provide a MSFC heritage optic ID from [\'X-7\', \'X-8\'].")
+        logging.warning("Please provide a MSFC heritage optic ID from [\'X-7\', \'X-8\'] (telescope 2 and 5, respectively).")
         return
         
     _ft, vals_tilt = _get_ea_file_info(_id, "tilt", file=file_tilt)
@@ -107,7 +109,8 @@ def eff_area_msfc_10shell(mid_energies, off_axis_angle=0<<u.arcmin, optic_id=Non
 
 def _get_ea_file_info(optics_id, axis, file=None):
     """Loads in the desired heritage .txt optic file."""
-    _f = os.path.join(EFF_PATH, f"FOXSI3_Module_{optics_id}_EA_{axis}_v1.txt") if file is None else file
+    id2tel = {"X-7":2, "X-8":5}
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"eff_area_telescope-{id2tel[optics_id]}-{axis}_msfc_heritage"]) if file is None else file
     return _f, np.loadtxt(_f, delimiter=",")
 
 def _get_oa_and_ea_msfc_10shell(grid):
@@ -167,7 +170,7 @@ def eff_area_msfc_hi_res(mid_energies, off_axis_angle=None, position=None, use_m
     if off_axis_angle is not None:
         logging.warning(f"The `off_axis_angle` input for MSFC high-resolution optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     # msfc_hi_res effective areas
-    _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_msfc_hi_res"]) if file is None else file
     e, f1, f2, f3, f1_m, f2_m, f3_m = np.loadtxt(_f).T
 
     fm1, fm2, fm3 = (f1_m, f2_m, f3_m) if use_model else (f1, f2, f3)
@@ -207,7 +210,7 @@ def _eff_area_msfc(mid_energies, file=None):
     # msfc_hi_res effective areas
     logging.warning(f"Caution: This might not be the function ({sys._getframe().f_code.co_name}) you are looking for, please see `eff_area_msfc_hi_res`.")
     logging.warning("This current function loads in some very early numbers for the new FOXSI-4 MSFC optics.")
-    _f = os.path.join(EFF_PATH, "3Inner_EA_EPDL97_14AA.csv") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_early_msfc_hi_res"]) if file is None else file
     msfc_hi_res = pandas.read_csv(_f).to_numpy()[:,1:] # remove the first column that only indexes
     # in cm2 ; we use the innermost and the 3rd innermost shells (S10 and S08) [from Yixian]
     msfc_hi_res_es, msfc_hi_res_effas08, msfc_hi_res_effas10 = msfc_hi_res[:,0] << u.keV, msfc_hi_res[:,1] << u.cm**2, msfc_hi_res[:,3] << u.cm**2 
@@ -234,7 +237,7 @@ def _eff_area_nagoya(mid_energies, file=None):
     # nagoya sxr effective areas
     logging.warning(f"Caution: This might not be the function ({sys._getframe().f_code.co_name}) you are looking for and has other effects included than just optics.")
     logging.warning("This current function loads in some very early numbers for the new FOXSI-4 Nagoya SXR optics.")
-    _f = os.path.join(EFF_PATH, "effective-area_raytracing_soft-xray-optic_on-axis.txt") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_early_nagoya_sxt"]) if file is None else file
     nagoya_sxr = np.loadtxt(_f)
     nagoya_sxr_es, nagoya_sxr_effa = nagoya_sxr[:,0] << u.keV, nagoya_sxr[:,1]/100 << u.cm**2
 
@@ -290,12 +293,12 @@ def eff_area_nagoya_hxt(mid_energies, off_axis_angle=None, use_model=False, file
         logging.warning(f"The `off_axis_angle` input for Nagoya high-resolution optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     # nagoya hxr effective areas
     if not use_model:
-        _f = os.path.join(EFF_PATH, "nagoya_hxt_onaxis_measurement_v1.txt") if file is None else file
+        _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_measured_nagoya_hxt"]) if file is None else file
         nagoya_hxr = np.loadtxt(_f)
         nagoya_hxr_es, _, nagoya_hxr_effa, _ = nagoya_hxr[:,0] << u.keV, nagoya_hxr[:,1] << u.keV, nagoya_hxr[:,2] << u.mm**2, nagoya_hxr[:,3] << u.mm**2
         nagoya_hxr_effa = nagoya_hxr_effa << u.cm**2
     else:
-        _f = os.path.join(EFF_PATH, "HXR_Nagoya_FOXSI4.arf") if file is None else file
+        _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_modeled_nagoya_hxt"]) if file is None else file
         with fits.open(_f) as hdul:
             nagoya_hxr_es = (hdul[1].data["ENERG_LO"]+hdul[1].data["ENERG_HI"])/2 << u.keV
             nagoya_hxr_effa = hdul[1].data["SPECRESP"] << u.cm**2
@@ -347,12 +350,12 @@ def eff_area_nagoya_sxt(mid_energies, use_model=False, file=None):
     """
     # nagoya sxr effective areas
     if not use_model:
-        _f = os.path.join(EFF_PATH, "nagoya_sxt_onaxis_measurement_v1.txt") if file is None else file
+        _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_measured_nagoya_sxt"]) if file is None else file
         nagoya_sxr = np.loadtxt(_f)
         nagoya_sxr_es, _, nagoya_sxr_effa, _ = nagoya_sxr[:,0] << u.keV, nagoya_sxr[:,1] << u.keV, nagoya_sxr[:,2] << u.mm**2, nagoya_sxr[:,3] << u.mm**2
         nagoya_sxr_effa = nagoya_sxr_effa << u.cm**2
     else:
-        _f = os.path.join(EFF_PATH, "SXR_nocollimator_noobf.arf") if file is None else file
+        _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_modeled_nagoya_sxt"]) if file is None else file
         with fits.open(_f) as hdul:
             nagoya_sxr_es = (hdul[1].data["ENERG_LO"]+hdul[1].data["ENERG_HI"])/2 << u.keV
             nagoya_sxr_effa = hdul[1].data["SPECRESP"] << u.cm**2
@@ -409,8 +412,7 @@ def eff_area_cmos(mid_energies, telescope=None, file=None):
     if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
-        
-    _f = os.path.join(EFF_PATH, f"foxsi4_telescope-{telescope}_BASIC_mirror_effective_area_v1.fits") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"eff_area_cmos_mirror{telescope}"]) if file is None else file
     with fits.open(_f) as hdul:
         es, effas = hdul[2].data << u.keV, hdul[1].data << u.cm**2
     mid_energies = native_resolution(native_x=es, input_x=mid_energies)
@@ -477,7 +479,7 @@ def eff_area_cmos_telescope(mid_energies, telescope=None, file=None):
     logging.warning("If you care about what elements are included then proceed carefully.")
     logging.warning("For current file, see PR#11 in the `cmos-tools` repository.")
 
-    _f = os.path.join(EFF_PATH, f"foxsi4_telescope-{telescope}_BASIC_TELESCOPE_RESPONSE_V25APR13.fits") if file is None else file
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"eff_area_cmos_telescope{telescope}"]) if file is None else file
     with fits.open(_f) as hdul:
         # _ is the off-axis angle but it's just [0] at the minute
         ea_energies, _, effas = hdul[2].data << u.keV, hdul[3].data << u.arcsec, hdul[1].data << u.cm**2
@@ -688,7 +690,7 @@ def asset_all_optics(save_asset=False):
         gsax.set_ylim([0, np.nanmax(x8.effective_areas).value*1.01])
 
     gs_ax5 = fig.add_subplot(gs[2, 0])
-    _f = os.path.join(EFF_PATH, "FOXSI4_Module_MSFC_HiRes_EA_with_models_v1.txt")
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_msfc_hi_res"])
     e, *_ = np.loadtxt(_f).T
     e <<= u.keV
     msfc_hi_res_p0 = eff_area_msfc_hi_res(e, position=0)

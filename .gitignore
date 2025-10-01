@@ -10,11 +10,11 @@ response_tools.egg-info/
 build/
 
 # data directories
-response-information/attenuation-data/
-response-information/detector-response-data/
-response-information/effective-area-data/
-response-information/quantum-efficiency-data/
-response-information/atmospheric-data/
+response_tools/response-information/attenuation-data/
+response_tools/response-information/detector-response-data/
+response_tools/response-information/effective-area-data/
+response_tools/response-information/quantum-efficiency-data/
+response_tools/response-information/atmospheric-data/
 
 # environment
 .env/

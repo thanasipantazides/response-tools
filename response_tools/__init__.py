@@ -10,6 +10,9 @@ The base `response_tools` namespace includes:
     The information stored in a YAML file that includes information from
     the flight.
 
+`~response_tools.responseFilePath`
+    The response data file location.
+
 `~response_tools.__version__`
     The current version of the code as stated in the setup script.
 
@@ -27,8 +30,12 @@ Examples
 ...
 """
 
+import os
+import pathlib
+
 from .version import __version__
 from response_tools.io.load_yaml import load_response_context
 
 # for global context info
 contextResponseInfo = load_response_context()
+responseFilePath = os.path.join(pathlib.Path(__file__).parent, "response-information")

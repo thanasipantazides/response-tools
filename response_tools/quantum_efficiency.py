@@ -10,9 +10,11 @@ from astropy.io import fits
 import astropy.units as u
 import numpy as np
 
+import response_tools
 from response_tools.util import BaseOutput, native_resolution
 
-Q_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "quantum-efficiency-data")
+FILE_PATH = response_tools.responseFilePath
+RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["quantum_efficiency"]
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "quantum-eff-figs")
 
 @dataclass
@@ -62,8 +64,8 @@ def qe_cmos(mid_energies, telescope=None, file=None):
     if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
-        
-    _f = os.path.join(Q_PATH, f"foxsi4_telescope-{telescope}_BASIC_sensor_quantum_efficiency_v1.fits") if file is None else file
+    
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"qe_cmos_telescope-{telescope}"]) if file is None else file
     with fits.open(_f) as hdul:
         es, qe = hdul[2].data << u.keV, hdul[1].data << u.dimensionless_unscaled
     mid_energies = native_resolution(native_x=es, input_x=mid_energies)

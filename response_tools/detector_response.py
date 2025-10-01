@@ -1,4 +1,4 @@
-"""Code to load different detectro responses. """
+"""Code to load different detector responses. """
 
 from dataclasses import dataclass
 
@@ -11,9 +11,11 @@ from astropy.io import fits
 import astropy.units as u
 import numpy as np
 
+import response_tools
 from response_tools.util import BaseOutput
 
-DET_RESP_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "response-information", "detector-response-data")
+FILE_PATH = response_tools.responseFilePath
+RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["detectors"]
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "det-resp-figs")
 
 @dataclass
@@ -149,7 +151,9 @@ def cdte_det_resp(cdte:int=None, region:int=None, pitch=None, side:str="merged",
     
     region = pitch2region[pitch] if have_pitch else region
     
-    _f = os.path.join(DET_RESP_PATH, "cdte", side, f"Resp_3keVto30keV_CdTe{cdte}_reg{region}_{event_type}.rmf") if file is None else file
+    _f = os.path.join(FILE_PATH, 
+                      RESPONSE_INFO_TYPE[f"cdte_det_{side}_resp"], 
+                      f"Resp_3keVto30keV_CdTe{cdte}_reg{region}_{event_type}.rmf") if file is None else file
     r = cdte_det_resp_rmf(_f)
     r.update_function_path(sys._getframe().f_code.co_name)
     r.detector = f"CdTe{cdte}-Detector-Response"
@@ -176,10 +180,8 @@ def cmos_det_resp(file=None, telescope=None):
     if (telescope is None) or (telescope not in [0,1]):
         logging.warning(f"The `telescope` input in {sys._getframe().f_code.co_name} must be 0 or 1.")
         return
-        
-    _f = os.path.join(DET_RESP_PATH, 
-                      "cmos", 
-                      f"foxsi4_telescope-{telescope}_BASIC_RESPONSE_MATRIX_v1.fits") if file is None else file
+    
+    _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"cmos_det_telescope-{telescope}_resp"]) if file is None else file
     
     with fits.open(_f) as hdul:
         matrix, counts, energy = hdul[1].data<<(u.DN/u.ph), hdul[2].data<<u.DN, hdul[3].data<<u.keV # units?
@@ -433,7 +435,7 @@ def asset_cmos_resp(save_asset=False):
 
 def asset_cdte_resp(save_asset=False):
     # CdTe
-    d_rmf = os.path.join(DET_RESP_PATH, "cdte", "pt") 
+    d_rmf = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"cdte_det_pt_resp"])
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"
 
     cdte_resp = cdte_det_resp_rmf(os.path.join(pathlib.Path(__file__).parent, d_rmf, f_rmf))
