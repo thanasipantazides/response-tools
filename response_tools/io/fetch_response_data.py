@@ -15,6 +15,7 @@ import urllib.request
 from urllib.parse import urljoin
 
 from response_tools.io.load_yaml import load_response_context
+from response_tools import responseFilePath
 
 local_prefix = 'response-information'
 
@@ -136,19 +137,19 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
         URL and all local paths for saving data from a config file:
         `response-tools/response-information/info.yaml`. All downloaded response data will be
         saved under `response-tools/response-information`.
-    
+
         Parameters
         ----------
         replace_existing : `bool`
             Whether to replace local files with newer versions, if newer versions are
-            downloaded. Currently throws `NotImplementedError`.  
+            downloaded. Currently throws `NotImplementedError`.
 
         verbose : `bool`
             Toggle for printing verbosely. If `True`, download progress indicators and
             filenames are displayed. If `False`, nothing is printed at all.
 
         Returns
-        -------    
+        -------
         : `downloaded`
             A dict of downloaded data. Keys are the same file identifiers from the YAML
             source. Values are the absolute paths on the local filesystem to the downloaded
@@ -158,7 +159,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
 
     if replace_existing == True:
         raise NotImplementedError("No support yet for replacement of old file versions.")
-    
+
     # print if the verbose flag is set:
     def verbose_print(*something):
         if verbose:
@@ -166,13 +167,13 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
 
     req = load_response_context()
     server_url = req["remote_server"]
-    
+
     # for urllib.parse.urljoin to work correctly, server path prefix must end in `/`:
     if server_url[-1] != "/":
         server_url += "/"
-    
+
     # directory on local filesystem for saving data:
-    local_info_dir = os.path.abspath(os.path.join(__file__, "..", "..", "response-information"))
+    local_info_dir = os.path.abspath(responseFilePath)
     verbose_print("Retrieving response products from:", green_str(server_url))
     verbose_print("Saving response products to:", green_str(local_info_dir))
 
@@ -186,7 +187,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     destination_path = []   # local path to save them to
     source_name = []        # identifier of the file (YAML key)
     do_get = []             # flag whether to download (if the file already exists locally)
-    
+
     for comp_name in req["files"].keys():
         for f_name, suffix in req["files"][comp_name].items():
             desired_files.append(urljoin(server_url, suffix))
@@ -236,7 +237,4 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     return downloaded
 
 if __name__ == "__main__":
-    # DownloadPrompt()
-
     downloaded = foxsi4_download_required(verbose=True)
-    pprint.pprint(downloaded)

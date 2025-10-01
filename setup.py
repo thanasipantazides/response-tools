@@ -7,7 +7,7 @@ setuptools.setup(
     url="https://github.com/foxsi/response-tools",
     install_requires=[
             "setuptools",
-            "numpy", 
+            "numpy",
             "scipy",
             "matplotlib",
             "pyyaml",

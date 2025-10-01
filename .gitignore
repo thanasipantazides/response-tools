@@ -19,3 +19,6 @@ response_tools/response-information/atmospheric-data/
 # environment
 .env/
 .venv/
+
+.ropeproject/
+.zed/
