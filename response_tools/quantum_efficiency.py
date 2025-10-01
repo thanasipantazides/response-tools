@@ -8,6 +8,7 @@ import sys
 
 from astropy.io import fits
 import astropy.units as u
+import matplotlib.pyplot as plt
 import numpy as np
 
 import response_tools
@@ -15,7 +16,7 @@ from response_tools.util import BaseOutput, native_resolution
 
 FILE_PATH = response_tools.responseFilePath
 RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["quantum_efficiency"]
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "quantum-eff-figs")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "assets", "response-tools-figs", "quantum-eff-figs")
 
 @dataclass
 class QuantumEffOutput(BaseOutput):
@@ -81,7 +82,7 @@ def qe_cmos(mid_energies, telescope=None, file=None):
                             detector="CMOS{telescope}-Quantum-Efficiency"
                             )
 
-def asset_qe(save_asset=False):
+def asset_qe(save_location=None):
     mid_energies = np.linspace(0, 20, 1000)<<u.keV
     plt.figure()
     qe0 = qe_cmos(mid_energies, telescope=0)
@@ -94,16 +95,11 @@ def asset_qe(save_asset=False):
     plt.xlim([np.min(mid_energies.value), np.max(mid_energies.value)])
     plt.ylim([0, 1.01])
     plt.legend()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"cmos-qunatum-eff.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"cmos-qunatum-eff.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 if __name__=="__main__":
-    import matplotlib.pyplot as plt
-
-    SAVE_ASSETS = False
-    asset_qe(save_asset=SAVE_ASSETS)
-    
-
-    
+    save_location = None # ASSETS_PATH
+    asset_qe(save_location=save_location)

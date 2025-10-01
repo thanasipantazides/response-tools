@@ -9,6 +9,9 @@ import sys
 
 from astropy.io import fits
 import astropy.units as u
+from matplotlib.colors import LogNorm, Normalize
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 import numpy as np
 
 import response_tools
@@ -16,7 +19,7 @@ from response_tools.util import BaseOutput
 
 FILE_PATH = response_tools.responseFilePath
 RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["detectors"]
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "det-resp-figs")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "assets", "response-tools-figs", "det-resp-figs")
 
 @dataclass
 class DetectorResponseOutput(BaseOutput):
@@ -387,7 +390,7 @@ def vrmf2arr_py(data=None, n_grp_list=None, f_chan_array=None, n_chan_array=None
 
     return mat_array_py
 
-def asset_cmos_resp(save_asset=False):
+def asset_cmos_resp(save_location=None):
     # CMOS
     fig = plt.figure(figsize=(12,7))
 
@@ -428,12 +431,12 @@ def asset_cmos_resp(save_asset=False):
     cax.tick_params(axis='both', which='major', labelsize=6)
 
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"cmos-response-matrices.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"cmos-response-matrices.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_cdte_resp(save_asset=False):
+def asset_cdte_resp(save_location=None):
     # CdTe
     d_rmf = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"cdte_det_pt_resp"])
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"
@@ -477,18 +480,12 @@ def asset_cdte_resp(save_asset=False):
 
     fig.suptitle(f_rmf)
 
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"cdte-response-matrix.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"cdte-response-matrix.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 if __name__=="__main__":
-    from matplotlib.colors import LogNorm, Normalize
-    import matplotlib.gridspec as gridspec
-    import matplotlib.pyplot as plt
-
-    SAVE_ASSETS = False
-
-    asset_cdte_resp(save_asset=SAVE_ASSETS)
-    
-    asset_cmos_resp(save_asset=SAVE_ASSETS)
+    save_location = None # ASSETS_PATH
+    asset_cdte_resp(save_location=save_location)
+    asset_cmos_resp(save_location=save_location)

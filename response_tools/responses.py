@@ -834,7 +834,7 @@ def asset_response_chain_plot(save_location=None):
         plt.savefig(os.path.join(save_location,"response-chain.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_response_hit_combination_plot(save_location=False):
+def asset_response_hit_combination_plot(save_location=None):
     """Look at different combinations of the 1hit and 2hit responses."""
     p5_rmf1 = foxsi4_telescope5_rmf(region=0, _event_type="1hit")
     p5_rmf2 = foxsi4_telescope5_rmf(region=0, _event_type="2hit")

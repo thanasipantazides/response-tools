@@ -19,7 +19,7 @@ from response_tools.util import BaseOutput, native_resolution
 
 FILE_PATH = response_tools.responseFilePath
 RESPONSE_INFO_TYPE = response_tools.contextResponseInfo["files"]["optics"]
-ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "..", "assets", "response-tools-figs", "eff-area-figs")
+ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "assets", "response-tools-figs", "eff-area-figs")
 
 @dataclass
 class EffAreaOutput(BaseOutput):
@@ -500,7 +500,7 @@ def eff_area_cmos_telescope(mid_energies, telescope=None, file=None):
                          model=True,
                          )
 
-def asset_cmos_plot(save_asset=False):
+def asset_cmos_plot(save_location=None):
     """Plot the CMOS data to visually check."""
     mid_energies = np.linspace(0, 20, 1000)<<u.keV
     
@@ -536,12 +536,12 @@ def asset_cmos_plot(save_asset=False):
     plt.legend()
 
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"cmos-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"cmos-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_cmos_files(save_asset=False):
+def asset_cmos_files(save_location=None):
     """Plot the CMOS data to visually check."""
     mid_energies = np.linspace(0, 20, 1000)<<u.keV
     
@@ -582,12 +582,12 @@ def asset_cmos_files(save_asset=False):
     print(att_cmos_collimator_ratio(0<<u.arcmin, telescope=0), 1/att_cmos_collimator_ratio(0<<u.arcmin, telescope=0).transmissions)
 
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"cmos-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"cmos-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
-def asset_all_optics(save_asset=False):
+def asset_all_optics(save_location=None):
     """Produce a figure showing all optics as an assets."""
     # most optics
     fig = plt.figure(figsize=(9.5, 9.5))
@@ -735,13 +735,13 @@ def asset_all_optics(save_asset=False):
     plt.legend(handles=p1, fontsize=6)
 
     plt.tight_layout()
-    if save_asset:
-        pathlib.Path(ASSETS_PATH).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(ASSETS_PATH,"heritage-and-msfc-optics.png"), dpi=200, bbox_inches="tight")
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"heritage-and-msfc-optics.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 if __name__=="__main__":
-    save_asset = False
-    asset_cmos_plot(save_asset=save_asset)
-    asset_cmos_files(save_asset=save_asset)
-    asset_all_optics(save_asset=save_asset)
+    save_location = None # ASSETS_PATH
+    asset_cmos_plot(save_location=save_location)
+    asset_cmos_files(save_location=save_location)
+    asset_all_optics(save_location=save_location)
