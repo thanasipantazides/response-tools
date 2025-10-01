@@ -543,6 +543,7 @@ def asset_cmos_plot(save_location=None):
 
 def asset_cmos_files(save_location=None):
     """Plot the CMOS data to visually check."""
+    from response_tools.attenuation import att_cmos_obfilter, att_cmos_collimator_ratio
     mid_energies = np.linspace(0, 20, 1000)<<u.keV
     
     #cmos optics/telescopes
@@ -561,8 +562,6 @@ def asset_cmos_files(save_location=None):
     gs_ax0.set_xlabel(f"Energy [{mid_energies.unit:latex}]")
     plt.legend()
     plt.yscale("log")
-
-    from attenuation import att_cmos_obfilter, att_cmos_collimator_ratio
 
     gs_ax1 = fig.add_subplot(gs[0, 1])
     a1 = eff_area_cmos(mid_energies, telescope=1)
@@ -584,7 +583,7 @@ def asset_cmos_files(save_location=None):
     plt.tight_layout()
     if save_location is not None:
         pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
-        plt.savefig(os.path.join(save_location,"cmos-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
+        plt.savefig(os.path.join(save_location,"nagoya-sxr-optics-resp.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
 def asset_all_optics(save_location=None):

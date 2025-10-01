@@ -189,10 +189,20 @@ def cmos_det_resp(file=None, telescope=None):
     with fits.open(_f) as hdul:
         matrix, counts, energy = hdul[1].data<<(u.DN/u.ph), hdul[2].data<<u.DN, hdul[3].data<<u.keV # units?
 
+    # counts & energy come as the bin centers, not edges
+    # check for uniform binning and convert to bin edges...
+    # round to avoid differences in float precision
+    diff_counts, diff_energy = round(np.diff(counts), 3), round(np.diff(energy), 3)
+    assert np.min(diff_counts)==np.max(diff_counts), f"In {sys._getframe().f_code.co_name}, the counts axis values do not appear to follow uniform binning and so cannot be automatically converted from bin centers to edges:\n{diff_counts}"
+    assert np.min(diff_energy)==np.max(diff_energy), f"In {sys._getframe().f_code.co_name}, the energy axis values do not appear to follow uniform binning and so cannot be automatically converted from bin centers to edges:\n{diff_energy}"
+    
+    counts_edges = np.append(counts-(0.5*diff_counts[0]), counts[-1]+(0.5*diff_counts[0]))
+    energy_edges = np.append(energy-(0.5*diff_energy[0]), energy[-1]+(0.5*diff_energy[0]))
+
     return DetectorResponseOutput(filename=file,
                                   function_path=f"{sys._getframe().f_code.co_name}",
-                                  input_energy_edges=energy,
-                                  output_energy_edges=counts,
+                                  input_energy_edges=energy_edges,
+                                  output_energy_edges=counts_edges,
                                   detector_response=matrix,
                                   detector=f"CMOS{telescope}-Detector-Response"
                                   )
