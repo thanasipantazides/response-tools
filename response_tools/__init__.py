@@ -19,15 +19,16 @@ The base `response_tools` namespace includes:
 Examples
 --------
 # importing the module is as easy as:
+
 >>> import response_tools
 
 # then accessing, e.g., the context information for the flight/flare
+
 >>> print(response_tools.contextResponseInfo)
-...
 
 # that can be accessed like a native Python dictionary
+
 >>> print(response_tools.contextResponseInfo["..."])
-...
 """
 
 import os
