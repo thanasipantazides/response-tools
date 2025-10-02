@@ -16,6 +16,10 @@ There is an "examples" and a "tests" folder. The "examples" folder is a great pl
 
 More information will be placed here with regards as to how this package is recommended to be used.
 
+### Documentation
+
+Documentation can be found in the [Response Tools Data Guide](./Response Tools Data Guide v1.pdf) and in the [online documentation](https://foxsi.github.io/response-tools/index.html).
+
 ## Install tips
 
 In order to work with some preliminary data, it is instructive to set up a virtual environment (more information below) and install necessary packages. The suggested way to do this is to create an environment with:
