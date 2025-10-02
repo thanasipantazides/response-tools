@@ -8,23 +8,23 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 
-from attenuation import (att_thermal_blanket, 
-                         att_uniform_al_cdte, 
-                         att_pixelated, 
-                         att_al_mylar,
-                         att_cmos_obfilter,
-                         att_cmos_collimator_ratio,
-                         att_cmos_filter,
-                         )
-from detector_response import (cdte_det_resp, 
-                               cmos_det_resp,
-                               )
-from effective_area import (eff_area_msfc_10shell, 
-                            eff_area_msfc_hi_res,
-                            eff_area_nagoya_hxt,
-                            eff_area_cmos,
-                            )
-from quantum_efficiency import qe_cmos
+from response_tools.attenuation import (att_thermal_blanket, 
+                                        att_uniform_al_cdte, 
+                                        att_pixelated, 
+                                        att_al_mylar,
+                                        att_cmos_obfilter,
+                                        att_cmos_collimator_ratio,
+                                        att_cmos_filter,
+                                        )
+from response_tools.detector_response import (cdte_det_resp, 
+                                              cmos_det_resp,
+                                              )
+from response_tools.effective_area import (eff_area_msfc_10shell, 
+                                           eff_area_msfc_hi_res,
+                                           eff_area_nagoya_hxt,
+                                           eff_area_cmos,
+                                           )
+from response_tools.quantum_efficiency import qe_cmos
 
 ASSETS_PATH = os.path.join(pathlib.Path(__file__).parent, "assets", "response-tools-figs", "response-paths")
 

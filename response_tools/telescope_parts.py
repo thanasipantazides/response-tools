@@ -115,18 +115,18 @@ def foxsi4_position2_detector_response(region:int=None, pitch=None, _side:str="m
         The region of the CdTe detector required. Either provide 
         `region` _xor_ `pitch`. The `region` maps onto the pitches used 
         across the detector. 
-            Region 0 -> 60<<astropy.units.um 
-            Region 1 -> 80<<astropy.units.um
-            Region 2 -> 100<<astropy.units.um
+        - Region 0 -> 60<<astropy.units.um 
+        - Region 1 -> 80<<astropy.units.um
+        - Region 2 -> 100<<astropy.units.um
 
     pitch : `astropy.units.quantity.Quantity`
         Instead of `region`, it might be more usefule to specify the 
         pitch in physical units (must b convertable to 
         `astropy.units.um`). Either provide `region` _xor_ `pitch`.
         The pitches map onto the `region` input.
-            60<<astropy.units.um -> Region 0
-            80<<astropy.units.um -> Region 1
-            100<<astropy.units.um -> Region 2
+        - 60<<astropy.units.um -> Region 0
+        - 80<<astropy.units.um -> Region 1
+        - 100<<astropy.units.um -> Region 2
 
     _side : `str`
         Define the side on the detector the user requires the response 
@@ -273,18 +273,18 @@ def foxsi4_position3_detector_response(region:int=None, pitch=None, _side:str="m
         The region of the CdTe detector required. Either provide 
         `region` _xor_ `pitch`. The `region` maps onto the pitches used 
         across the detector. 
-            Region 0 -> 60<<astropy.units.um 
-            Region 1 -> 80<<astropy.units.um
-            Region 2 -> 100<<astropy.units.um
+        - Region 0 -> 60<<astropy.units.um 
+        - Region 1 -> 80<<astropy.units.um
+        - Region 2 -> 100<<astropy.units.um
 
     pitch : `astropy.units.quantity.Quantity`
         Instead of `region`, it might be more usefule to specify the 
         pitch in physical units (must b convertable to 
         `astropy.units.um`). Either provide `region` _xor_ `pitch`.
         The pitches map onto the `region` input.
-            60<<astropy.units.um -> Region 0
-            80<<astropy.units.um -> Region 1
-            100<<astropy.units.um -> Region 2
+        - 60<<astropy.units.um -> Region 0
+        - 80<<astropy.units.um -> Region 1
+        - 100<<astropy.units.um -> Region 2
 
     _side : `str`
         Define the side on the detector the user requires the response 
@@ -407,18 +407,18 @@ def foxsi4_position4_detector_response(region:int=None, pitch=None, _side:str="m
         The region of the CdTe detector required. Either provide 
         `region` _xor_ `pitch`. The `region` maps onto the pitches used 
         across the detector. 
-            Region 0 -> 60<<astropy.units.um 
-            Region 1 -> 80<<astropy.units.um
-            Region 2 -> 100<<astropy.units.um
+        - Region 0 -> 60<<astropy.units.um 
+        - Region 1 -> 80<<astropy.units.um
+        - Region 2 -> 100<<astropy.units.um
 
     pitch : `astropy.units.quantity.Quantity`
         Instead of `region`, it might be more usefule to specify the 
         pitch in physical units (must b convertable to 
         `astropy.units.um`). Either provide `region` _xor_ `pitch`.
         The pitches map onto the `region` input.
-            60<<astropy.units.um -> Region 0
-            80<<astropy.units.um -> Region 1
-            100<<astropy.units.um -> Region 2
+        - 60<<astropy.units.um -> Region 0
+        - 80<<astropy.units.um -> Region 1
+        - 100<<astropy.units.um -> Region 2
 
     _side : `str`
         Define the side on the detector the user requires the response 
@@ -561,18 +561,18 @@ def foxsi4_position5_detector_response(region:int=None, pitch=None, _side:str="m
         The region of the CdTe detector required. Either provide 
         `region` _xor_ `pitch`. The `region` maps onto the pitches used 
         across the detector. 
-            Region 0 -> 60<<astropy.units.um 
-            Region 1 -> 80<<astropy.units.um
-            Region 2 -> 100<<astropy.units.um
+        - Region 0 -> 60<<astropy.units.um 
+        - Region 1 -> 80<<astropy.units.um
+        - Region 2 -> 100<<astropy.units.um
 
     pitch : `astropy.units.quantity.Quantity`
         Instead of `region`, it might be more usefule to specify the 
         pitch in physical units (must b convertable to 
         `astropy.units.um`). Either provide `region` _xor_ `pitch`.
         The pitches map onto the `region` input.
-            60<<astropy.units.um -> Region 0
-            80<<astropy.units.um -> Region 1
-            100<<astropy.units.um -> Region 2
+        - 60<<astropy.units.um -> Region 0
+        - 80<<astropy.units.um -> Region 1
+        - 100<<astropy.units.um -> Region 2
 
     _side : `str`
         Define the side on the detector the user requires the response 

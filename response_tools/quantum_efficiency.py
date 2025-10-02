@@ -47,8 +47,8 @@ def qe_cmos(mid_energies, telescope=None, file=None):
     telescope : `int`
         The focal plane position of the detector of the desired quantum 
         efficiency. Must be in the list [0, 1]. 
-            Telescope 0 -> Position 0
-            Telescope 1 -> Position 1
+        - Telescope 0 -> Position 0
+        - Telescope 1 -> Position 1
         Default: None
 
     file : `str` or `None`
