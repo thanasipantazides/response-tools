@@ -6,6 +6,10 @@ Repository to manage response elements, originally for the FOXSI-4 sounding rock
 
 **Note:** Although this repositiory can be extanded to any other instrument (e.g., FOXSI-1, -2, and -3), this repository is only currently aimed for FOXSI-4 use.
 
+### Documentation
+
+Documentation can be found in the [Response Tools Data Guide](./Response-Tools-Data-Guide-v1.pdf) and in the [online documentation](https://foxsi.github.io/response-tools/index.html). 
+
 ## `response-tools`
 
 A repository to software tools for the response system used for the FOXSI mission in Python (woo, Python). We will include helpful loader functions for the all the response elements and download clients to obtain the files.
@@ -15,10 +19,6 @@ The tools being developed in Python should be placed in the `response_tools` fol
 There is an "examples" and a "tests" folder. The "examples" folder is a great place to include scripts that show how some of the code in the repository works and the "tests" folder is a fantastic place to put code that tests the tools that have been created.
 
 More information will be placed here with regards as to how this package is recommended to be used.
-
-### Documentation
-
-Documentation can be found in the [Response Tools Data Guide](./Response-Tools-Data-Guide-v1.pdf) and in the [online documentation](https://foxsi.github.io/response-tools/index.html). 
 
 ## Install tips
 
