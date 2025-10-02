@@ -234,19 +234,19 @@ def _read_rmf(file):
 
 def col2arr_py(data):
     """Takes a list of parameters for each energy channel from a .rmf 
-    file and returns it in the correct format.
+    file and returns it in the correct format [1].
 
-    From: https://lost-contact.mit.edu/afs/physics.wisc.edu/home/craigm/lib/idl/util/vcol2arr.pro
-
-    **This original function is taken from Sunkit-spex**
-    - https://github.com/sunpy/sunkit-spex
+    This original function is taken from Sunkit-spex [2]
     - Tweaked to change `r` below to `[r]` since the values in data 
     aren't lists (e.g., NuSTAR)
+
+    [1] https://lost-contact.mit.edu/afs/physics.wisc.edu/home/craigm/lib/idl/util/vcol2arr.pro
+    [2] https://github.com/sunpy/sunkit-spex
 
     Parameters
     ----------
     data : array/list-like object
-            One parameter's array/list from the .rmf file.
+        One parameter's array/list from the .rmf file.
 
     Returns
     -------
@@ -254,17 +254,16 @@ def col2arr_py(data):
 
     Example
     -------
-    data = FITS_rec([(  1.6 ,   1.64,   1, [0]   , [18]  , [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-                     (  1.64,   1.68,   1, [0]   , [20]  , [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-                     (  1.68,   1.72,   2, [0,22], [20,1], [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
-                     dtype=(numpy.record, [('ENERG_LO', '>f4'), ('ENERG_HI', '>f4'), ('N_GRP', '>i2'),
-                                           ('F_CHAN', '>i4', (2,)), ('N_CHAN', '>i4', (2,)), ('MATRIX', '>i4', (2,))]))
-
-     col2arr_py(data['F_CHAN'])
+    >>> data = FITS_rec([(  1.6 ,   1.64,   1, [0]   , [18]  , [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
+                         (  1.64,   1.68,   1, [0]   , [20]  , [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
+                         (  1.68,   1.72,   2, [0,22], [20,1], [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),
+                         dtype=(numpy.record, [('ENERG_LO', '>f4'), ('ENERG_HI', '>f4'), ('N_GRP', '>i2'),
+                                               ('F_CHAN', '>i4', (2,)), ('N_CHAN', '>i4', (2,)), ('MATRIX', '>i4', (2,))]))
+    # max row length of 2 so 2 columns, each row is an energy channel.
+    >>> col2arr_py(data['F_CHAN'])
     array([[  0.,   0.],
            [  0.,   0.],
            [  0.,  22.]])
-    ## max row length of 2 so 2 columns, each row is an energy channel.
     """
 
     # this is the quicker way I have chosen to do in Python (this may be revised later but is ~30x faster than way below in Python)
@@ -277,52 +276,54 @@ def col2arr_py(data):
 
 def vrmf2arr_py(data=None, n_grp_list=None, f_chan_array=None, n_chan_array=None):
     """Takes redistribution parameters for each energy channel from a 
-    .rmf file and returns it in the correct format.
+    .rmf file and returns it in the correct format [1].
 
-    From: https://lost-contact.mit.edu/afs/physics.wisc.edu/home/craigm/lib/idl/spectral/vrmf2arr.pro
+    This original function is taken from Sunkit-spex [2].
 
-    **This original function is taken from Sunkit-spex**
-    - https://github.com/sunpy/sunkit-spex
+    [1] https://lost-contact.mit.edu/afs/physics.wisc.edu/home/craigm/lib/idl/spectral/vrmf2arr.pro
+    [2] https://github.com/sunpy/sunkit-spex
 
     Parameters
     ----------
     data : array/list-like object
-            Redistribution matrix parameter array/list from the .rmf file. Units are counts per photon.
+            Redistribution matrix parameter array/list from the .rmf 
+            file. Units are counts per photon.
             Default : None
 
     no_of_channels : int
-            Number of entries is the total number of photon channels, the entries themselves show the total number
+            Number of entries is the total number of photon channels, 
+            the entries themselves show the total number
             of count channels to which that photon channel contributes.
             Default : None
 
     f_chan_array : numpy.array
-            The index of each sub-set channel from each energy bin from the .rmf file run through col2arr_py().
+            The index of each sub-set channel from each energy bin from 
+            the .rmf file run through col2arr_py().
             Default : None
 
     n_chan_array : numpy.array
-            The number of sub-set channels in each index for each energy bin from the .rmf file run through col2arr_py().
+            The number of sub-set channels in each index for each energy 
+            bin from the .rmf file run through col2arr_py().
             Default : None
 
     Returns
     -------
-    A 2D numpy array of the correctly ordered input data with dimensions of energy in the rows and channels in
-    the columns.
+    A 2D numpy array of the correctly ordered input data with dimensions 
+    of energy in the rows and channels in the columns.
 
     Example
     -------
-     d_rmf = 'directory/'
-     f_rmf = 'file.rmf'
-     e_lo, e_hi, ngrp, fchan, nchan, matrix = det_io._read_rmf(d_rmf+f_rmf)
-
-     fchan_array = nu_spec.col2arr_py(fchan)
-     nchan_array = nu_spec.col2arr_py(nchan)
-
-     rmf = nu_spec.vrmf2arr_py(data=matrix,
+    >>> d_rmf = 'directory/'
+    >>> f_rmf = 'file.rmf'
+    >>> e_lo, e_hi, ngrp, fchan, nchan, matrix = det_io._read_rmf(d_rmf+f_rmf)
+    >>> fchan_array = nu_spec.col2arr_py(fchan)
+    >>> nchan_array = nu_spec.col2arr_py(nchan)
+    >>> rmf = nu_spec.vrmf2arr_py(data=matrix,
                                   n_grp_list=ngrp,
                                   f_chan_array=fchan_array,
                                   n_chan_array=nchan_array)
-     rmf
-
+    # rows = photon/energy channels, columns = counts channels
+    >>> rmf
     array([[0.00033627, 0.0007369 , 0.00113175, ..., 0.        , 0.        , 0.        ],
            [0.00039195, 0.00079259, 0.00138341, ..., 0.        , 0.        , 0.        ],
            [0.00042811, 0.00083381, 0.00157794, ..., 0.        , 0.        , 0.        ],
@@ -330,34 +331,28 @@ def vrmf2arr_py(data=None, n_grp_list=None, f_chan_array=None, n_chan_array=None
            [0.        , 0.        , 0.        , ..., 0.00408081, 0.00409889, 0.00403308],
            [0.        , 0.        , 0.        , ..., 0.00405333, 0.00413722, 0.00413216],
            [0.        , 0.        , 0.        , ..., 0.        , 0.        , 0.        ]])
-    ## rows = photon/energy channels, columns = counts channels
 
     What's Going On?
     ----------------
     The RMF file has the photon-to-counts conversion information in it.
-    The martix has the photon-to-count conversion value for each count channel (columns) that is involved with theach photon channel (rows).
-            E.g., matrix = [ [a, b, c, d, e, f, ...] ,
-                             [        ...          ] ,
-                             [        ...          ] ,
-                                      ...             ]
-    F_chan is the starting index of contiguous counts channels that are involved with the photon channel.
-            E.g., f_chan = [ [0, 5, 0, 0, 0, ...] ,
-                             [       ...        ] ,
-                             [       ...        ] ,
-                                     ...           ]
-                            For the first photon channel, there are rows of counts channels starting at index 0 and 5
-    N_chan is the corresponding number of counts channels from each index in the f_chan array.
-            E.g., n_chan = [ [2, 3, 0, 0, 0, ...] ,
-                             [        ...        ] ,
-                             [        ...        ] ,
-                                      ...           ]
-                            Starting at index 0 for the first photon channel we have the first 2 matrix values, then at index 5 we have the next 3.
-                            The total of each row is the same as the n_grp_list and the number of entries in each row of the matrix entry.
+    The martix has the photon-to-count conversion value for each count 
+    channel (column) that is involved with theach photon channel (rows).
+    E.g., matrix = [ [a, b, c, d, e, f, ...] , ... ]
+    F_chan is the starting index of contiguous counts channels that are 
+    involved with the photon channel.
+    E.g., f_chan = [ [0, 5, 0, 0, 0, ...] , ... ]
+    For the first photon channel, there are rows of counts channels 
+    starting at index 0 and 5 N_chan is the corresponding number of 
+    counts channels from each index in the f_chan array.
+    E.g., n_chan = [ [2, 3, 0, 0, 0, ...] , ... ]
+    Starting at index 0 for the first photon channel we have the first 2 
+    matrix values, then at index 5 we have the next 3.
+    The total of each row is the same as the n_grp_list and the number 
+    of entries in each row of the matrix entry.
     Putting all this together, the rmf matrix is:
-            rmf_matrix = [ [a, b, 0, 0, 0, c , d , e, 0 , 0 , ...] ,   #<-- index 0 (f_chan) with 2 entries (n_chan) with photon-to-counts conversion (matrix)
-                         [                 ...                   ] ,
-                         [                 ...                   ] ,
-                                           ...                      ]
+    rmf_matrix = [ [a, b, 0, 0, 0, c , d , e, 0 , 0 , ...] , ... ]
+    Index 0 (f_chan) with 2 entries (n_chan) with photon-to-counts 
+    conversion (matrix).
     """
     # this was is about >6x quicker in than the IDL code written in Python
 
@@ -401,6 +396,7 @@ def vrmf2arr_py(data=None, n_grp_list=None, f_chan_array=None, n_chan_array=None
     return mat_array_py
 
 def asset_cmos_resp(save_location=None):
+    """Plot the CMOS responses."""
     # CMOS
     fig = plt.figure(figsize=(12,7))
 
@@ -447,6 +443,7 @@ def asset_cmos_resp(save_location=None):
     plt.show()
 
 def asset_cdte_resp(save_location=None):
+    """Plot the CdTe1, region 0, 1-hit response."""
     # CdTe
     d_rmf = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE[f"cdte_det_pt_resp"])
     f_rmf = "Resp_3keVto30keV_CdTe1_reg0_1hit.rmf"

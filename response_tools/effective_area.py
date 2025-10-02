@@ -146,9 +146,9 @@ def eff_area_msfc_hi_res(mid_energies, off_axis_angle=None, position=None, use_m
     position : `int`
         The focal plane position of the desired optic. Must be in the
         list [0, 3, 6]. 
-            Position 0 -> X10/FM2
-            Position 3 -> X09/FM1
-            Position 6 -> X11/FM3
+        - Position 0 -> X10/FM2
+        - Position 3 -> X09/FM1
+        - Position 6 -> X11/FM3
         Default: None
 
     use_model : `bool`
@@ -394,8 +394,8 @@ def eff_area_cmos(mid_energies, telescope=None, file=None):
     telescope : `int`
         The focal plane position of the desired optic. Must be in the
         list [0, 1]. 
-            Telescope 0 -> Position 0 -> X10/FM2 
-            Telescope 1 -> Position 1 -> Nagoya-SXR
+        - Telescope 0 -> Position 0 -> X10/FM2 
+        - Telescope 1 -> Position 1 -> Nagoya-SXR
         Default: None
 
     file : `str` or `None`
@@ -455,8 +455,8 @@ def eff_area_cmos_telescope(mid_energies, telescope=None, file=None):
     telescope : `int`
         The focal plane position of the desired optic. Must be in the
         list [0, 1]. 
-            Telescope 0 -> Position 0 -> X10/FM2 
-            Telescope 1 -> Position 1 -> Nagoya-SXR
+        - Telescope 0 -> Position 0 -> X10/FM2 
+        - Telescope 1 -> Position 1 -> Nagoya-SXR
         Default: None
 
     file : `str` or `None`

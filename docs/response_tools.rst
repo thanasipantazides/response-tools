@@ -36,10 +36,10 @@ response\_tools.effective\_area module
    :show-inheritance:
    :undoc-members:
 
-response\_tools.ir\-plots module
+response\_tools.ir\_plots module
 --------------------------------
 
-.. automodule:: response_tools.ir-plots
+.. automodule:: response_tools.ir_plots
    :members:
    :show-inheritance:
    :undoc-members:
