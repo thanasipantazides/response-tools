@@ -18,7 +18,7 @@ More information will be placed here with regards as to how this package is reco
 
 ### Documentation
 
-Documentation can be found in the [Response Tools Data Guide](./Response Tools Data Guide v1.pdf) and in the [online documentation](https://foxsi.github.io/response-tools/index.html).
+Documentation can be found in the [Response Tools Data Guide](./Response-Tools-Data-Guide-v1.pdf) and in the [online documentation](https://foxsi.github.io/response-tools/index.html). 
 
 ## Install tips
 
