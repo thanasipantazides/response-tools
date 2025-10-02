@@ -16,7 +16,8 @@ Documentation/help can be found in the `Response Tools Data Guide <https://githu
    :maxdepth: 2
    :caption: Contents:
 
-   README.md
+   general_instructions
+   example_gallery
    modules
 
 .. image:: foxsi-1sol.png

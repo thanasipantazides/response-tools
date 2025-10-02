@@ -23,8 +23,6 @@ in the longer named moduels in the package like:
 - effective_area
 - quantum_efficiency
 
-THIS SCRIPT IS AN EXAMPLE, DO NOT USE DIRECTLY. 
------------------------------------------------
 If you would like to run the contents of this script and play around 
 with it then either use this file and be aware of not adding/commiting 
 any changes you make and/or just make a copy of this file, put it 

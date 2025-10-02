@@ -9,8 +9,6 @@ Response Matrix (DRM) of a FOXSI-4 telescope.
 The chosen telescope is Telescope 2 with photon path:
 - Thermal blanket -> Marshall 10-shell X-7 -> Al (0.015") -> CdTe4
 
-THIS SCRIPT IS AN EXAMPLE, DO NOT USE DIRECTLY. 
------------------------------------------------
 If you would like to run the contents of this script and play around 
 with it then either use this file and be aware of not adding/commiting 
 any changes you make and/or just make a copy of this file, put it 
