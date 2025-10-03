@@ -13,6 +13,7 @@ docs/sg_execution_times.rst
 # Python
 response_tools.egg-info/
 build/
+.eggs/
 
 # data directories
 response_tools/response-information/attenuation-data/

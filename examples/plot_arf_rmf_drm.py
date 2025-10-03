@@ -1,6 +1,6 @@
 """
-Plotting ARFs, RMFs, and DRMs
------------------------------
+Generating and plotting ARFs, RMFs, and DRMs
+============================================
 
 Script showing a quick example how to plot the Ancillary Response 
 Function (ARF), Redistribution Matrix Function (RMF), and the Detector 

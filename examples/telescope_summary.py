@@ -1,6 +1,6 @@
 """
 Telescope Summary
------------------
+=================
 
 An example showing the constituants and, therefore, photon paths of all 
 FOXSI-4 telescopes.
@@ -28,5 +28,5 @@ def behemoth_plot():
 
 
     mpl.pyplot.show()
-
+    
 behemoth_plot()

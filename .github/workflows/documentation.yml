@@ -17,6 +17,9 @@ jobs:
       - name: Install response-tools
         run: |
           pip install -e .
+      - name: Download data files
+        run: |
+          python -c "import response_tools.io.fetch_response_data as fetch;fetch.foxsi4_download_required(verbose=True)"
       - name: Sphinx construct
         run: |
           sphinx-apidoc -o docs response_tools/
