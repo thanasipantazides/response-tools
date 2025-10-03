@@ -16,3 +16,6 @@ Plotting examples
 * `plot_arf_rmf_drm.py <./plot_arf_rmf_drm.py>`__
 
   * Shows how to obtain and plot the ARF, RMF, and DRM for Telescope 2.
+
+Whole example gallery
+---------------------
