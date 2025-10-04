@@ -125,7 +125,7 @@ pos_rmf = responses.foxsi4_telescope2_rmf(region=user_region)
 # %%
 # Our user can use the RMF field ``input_energy_edges`` (synonymous with 
 # the incoming photon energies to the detector) to get the energies at 
-# which we want to sample the ARF product. Our user will grab the 
+# which they want to sample the ARF product. Our user will grab the 
 # mid-points of the incoming photon bins to be sensible:
 
 rmf_mid_energies = (pos_rmf.input_energy_edges[:-1]+pos_rmf.input_energy_edges[1:])/2
