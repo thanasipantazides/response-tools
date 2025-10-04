@@ -53,5 +53,7 @@ class BaseOutput:
         >>> ex["filename"]
         "foo"
         """
-        return (self.contents | {"fields":self.fields})[index]
+        return (self.contents | {"contents":self.contents,
+                                 "fields":self.fields,
+                                 "print_contents":self.print_contents})[index]
     
