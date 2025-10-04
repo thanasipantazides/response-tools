@@ -50,13 +50,58 @@ while in the directory the `response-tools` directory that contains the `setup.p
 
 Any time the code is updated and, say, you pull/download it from Github, make sure to perform the `pip install -e .` line from above again in your environment. Most of the time this is unnecessary but ensures any new changes, updated versions, etc. definitely take effect.
 
-## Example code
+## Getting the response files
+
+The code lives somewhere in the University of Minnesota. A user can either:
+
+- Use their own methods to trek through the data-file storage themselves and navigate the plethora of different file formats, standards, personal choices; or,
+- Use a Python interface developed to download the files.
+
+### Where the data lives
+
+Public access to the FOXSI-4 flight data is provided at the site:
+
+- [https://foxsi.space.umn.edu/data/response/response-components/](https://foxsi.space.umn.edu/data/response/response-components/)
+
+That link contains several subfolders of response data:
+
+- Attenuation data
+- Detector response data
+- Effective area data
+- Quantum efficiency data
+
+Users can also access the data via FTP at `foxsi.space.umn.edu/FOXSI`. There is no username or password required. Once connected to the FTP server, navigate to `data/response/response-components` to access response files.
+
+**Note:** users on the UMN eduroam WiFi network will not be able to access the `foxsi.space.umn.edu/data` site or the FTP server. All other networks tested have been able to access without issue.
+
+### Python interface to pull data
+
+The following will download all the response files to your machine:
+
+```python
+import response_tools.io.fetch_response_data as fetch
+fetch.foxsi4_download_required(verbose=True)
+# stop trying to make "fetch" happen
+```
+
+The functions in the package are designed to know where these function are and just use them as expected.
+
+To find where the files are stored in your filesystem, you can use the global package variable, `responseFilePath`:
+
+```python
+import response_tools
+print(response_tools.responseFilePath)
+```
+
+This allows a user to easily find where the response files are for their own purposes.
+
+## Locations of example code
 
 There are a few existing example scripts showing how to use a lot of tools in the repository.
 
-Python example scripts can be found in response-tools [examples](https://github.com/foxsi/response-tools/tree/main/examples) folder which has an associated [README file](https://github.com/foxsi/response-tools/blob/main/examples/README.md).
+An [example gallery](auto_examples/index) exists.
 
-An example gallery is coming soon.
+Original Python example scripts can be found in response-tools [examples](https://github.com/foxsi/response-tools/tree/main/examples) folder.
 
 ## The `response-information` directory
 
@@ -64,7 +109,9 @@ This directory contains context information about the response files that can be
 
 The [YAML](https://github.com/foxsi/response-tools/tree/main/response_tools/response-information) file contained in this directory is used to track the latest versions of files to be used and this directory also stores the data files after being downloaded.
 
-Response data files can be downloaded using the `response_tools.io.fetch_response_data.foxsi4_download_required` method via:
+Response data files can be downloaded using:
+
+- `response_tools.io.fetch_response_data.foxsi4_download_required` 
 
 ```python
 import response_tools.io.fetch_response_data as fetch

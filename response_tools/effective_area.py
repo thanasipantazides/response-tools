@@ -739,8 +739,26 @@ def asset_all_optics(save_location=None):
         plt.savefig(os.path.join(save_location,"heritage-and-msfc-optics.png"), dpi=200, bbox_inches="tight")
     plt.show()
 
+def asset_msfc_heritage_x7_example(save_location=None):
+    """The MSFC heritage X-7 optic effective area as a simple exmaple."""
+    output = eff_area_msfc_10shell(None<<u.keV, off_axis_angle=0<<u.arcmin, optic_id="X-7")
+
+    plt.figure()
+    plt.plot(output.mid_energies,
+             output.effective_areas)
+    plt.xlabel(f"Energy [{output.mid_energies.unit:latex}]")
+    plt.ylabel(f"Effective Area [{output.effective_areas.unit:latex}]")
+    plt.title(f"FOXSI-4 Optic : {output.optic_id}")
+
+    plt.tight_layout()
+    if save_location is not None:
+        pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
+        plt.savefig(os.path.join(save_location,"asset_msfc_heritage_x7_example.png"), dpi=200, bbox_inches="tight")
+    plt.show()
+
 if __name__=="__main__":
     save_location = None # ASSETS_PATH
     asset_cmos_plot(save_location=save_location)
     asset_cmos_files(save_location=save_location)
     asset_all_optics(save_location=save_location)
+    asset_msfc_heritage_x7_example(save_location=save_location)

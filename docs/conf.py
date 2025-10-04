@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import pathlib
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -66,4 +67,5 @@ html_static_path = ['_static']
 sphinx_gallery_conf = {
      'examples_dirs': '../examples',   # path to your example scripts
      'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+     'default_thumb_file': os.path.join(pathlib.Path(__file__).parent, 'foxsi-1sol.png'),
 }

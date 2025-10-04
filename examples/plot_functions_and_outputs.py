@@ -1,6 +1,6 @@
 """
-Function & Outputs
-==================
+Functions & Outputs
+===================
 
 Script showing a quick example on how to use the functions.
 
@@ -14,28 +14,44 @@ returned data-class objects.
 This example shows the use of nice high level functions that are tied to
 FOXSI-4 telescopes. 
 
-- responses
-- telescope_parts
+* The ``responses`` module.
+* The ``telescope_parts`` module
+
+This means we will eventually be dealing with high-level telescope 
+response products such as the Ancillary Response Function (ARF) and the 
+Redistribution Matrix Function (RMF).
 
 If you're looking for access to response data of the 
 individual components with more freedom then you'll likely be interested 
 in the longer named moduels in the package like:
 
-- attenuation
-- detector_response
-- effective_area
-- quantum_efficiency
-
-If you would like to run the contents of this script and play around 
-with it then either use this file and be aware of not adding/commiting 
-any changes you make and/or just make a copy of this file, put it 
-somewhere else on your computer, and play around with the copy.
+* The ``attenuation`` module.
+* The ``detector_response`` module.
+* The ``effective_area`` module.
+* The ``quantum_efficiency`` module.
 """
+
+# %%
+#
+# .. raw:: html
+# 
+#     <style> .colour {color:#e16b27;font-style:italic;} </style>
+# 
+# .. role:: colour
+#
+# :colour:`Please look over the FOXSI-4 observation resources to add` 
+# :colour:`more context as to how a user might decide on their choice` 
+# :colour:`of the function parameters. Additionally, look over the` 
+# :colour:`FOXSI-4 instrumentation resources when deciding which`
+# :colour:`functions to use.`
+#
+# Let's start with importing trusty Numpy as I'm sure we'll need it.
+
 
 import numpy as np
 
 # %%
-# For higher level user engagement, the following two modules are the 
+# For high-level user engagement, the following two modules are the 
 # ones likely to use. The `telescope_parts` are well-named functions 
 # tied to FOXSI positions: E.g., `foxsi4_position2_optics` will return 
 # FOXSI-4's optical information for Position/Telescope 2.
@@ -53,16 +69,19 @@ import response_tools.telescope_parts as telescope_parts
 # Let's look at the `foxsi4_position2_optics` function since we 
 # mentioned it earlier. To see the documentation for this, and any 
 # function, we can always run:
-#
-# >>> help(telescope_parts.foxsi4_position2_optics)
-#
-# We will see that the help function tells us about the function, how to 
-# use it, and what it returns. The above function is looking for some
-# energies and an off-axis angle.
+
+help(telescope_parts.foxsi4_position2_optics)
+
+# %%
+# We see that the help function tells us about the function, how to use 
+# it, and what it returns *(for those that are familiar with Python, 
+# ``help`` will display the docstring the queried Python object)*.
 # 
-# It shows that one thing we're making use of here are unit aware inputs 
-# to functions (believe me, when it comes to response units, this will 
-# save time). 
+# The above function is looking for some energies and an off-axis angle.
+# 
+# The ``help`` function also shows the function is making use of unit 
+# aware inputs to functions (believe me, when it comes to response 
+# units, this will save time). 
 # 
 # So let's import Astropy's unit module.
 
@@ -140,15 +159,16 @@ print(pos2_optics.effective_areas)
 # (DRM).
 # 
 # First, we can get the RMF for a telescope, say, Telescope 2 to be 
-# consistent with using position 2's components previously:
+# consistent with using position 2's components previously. 
 
 tel2_rmf = responses.foxsi4_telescope2_rmf(region=0)
 
 # %%
-# The `region` input refers to the different pitch regions across the 
-# CdTe detectors. IF you would rather specificy by passing the pitch 
-# (that is unit aware) then practice running `help` on the function and 
-# check the documentation.
+# We need to pass the detector region we are interested in for the 
+# correct response to be returned for the CdTe detectors. A user can 
+# define the detector area of interest another way using the strip pitch 
+# values for the CdTe detector. Feel free to make use of the ``help`` 
+# function to see how else the following function can be used.
 # 
 # The RMF defined the input and output energy axes for the detector so 
 # we might as well access the RMF input energies for those energies we 
