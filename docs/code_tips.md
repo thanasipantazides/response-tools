@@ -55,7 +55,7 @@ There are a number of fields common to all data-class types used in the package.
 | `output_energy_edges` | A unit aware array (likely in keV or DN) of the bin edges of a matrix response. The “output” edges referring to the exiting detector channels. |
 | `quantum_efficiency`  | A unit aware array (likely dimensionless) of the detector’s quantum efficiency.                                                                |
 | `response`            | A unit aware array, likely the combination of several telescope components to make part or the whole of a telescope’s response.                |
-| `response_type`       | Describes whether the response in the data-class is an ARF, RMF, or DRM.                                                                       |
+| `response_type`       | Describes whether the response in the data-class is an ARF, RMF, or SRM.                                                                       |
 | `telescope`           | Details the telescope to which the data, or components of the data, belongs.                                                                   |
 | `times`               | A unit aware list (likely in seconds) of the times at which the data was evaluated and then processed.                                         |
 | `transmissions`       | A unit aware array (likely dimensionless) of the attenuator’s transmission.                                                                    |
@@ -66,7 +66,7 @@ Inspecting a returned output and observing a subset of these fields should make 
 
 After you have your object(s), you might want to plot the contents for visual inspection. We can use the information in the data-class object to avoid a lot of manual bookkeeping jobs like tracking units.
 
-A user will likely be happy just getting the ARF, RMF, and DRM and will be on their way to do science (e.g., spectral fitting) with the product. However, a user might want to actually inspect what they have before running off. Even if they are not so familiar with and ARF and RMF, they still might be able to pick up on something that is not quite what they expect it to be. At the very least a user might want to ask very sensible questions about what they are working with as these products will heavily influence any spectral fitting results.
+A user will likely be happy just getting the ARF, RMF, and SRM and will be on their way to do science (e.g., spectral fitting) with the product. However, a user might want to actually inspect what they have before running off. Even if they are not so familiar with and ARF and RMF, they still might be able to pick up on something that is not quite what they expect it to be. At the very least a user might want to ask very sensible questions about what they are working with as these products will heavily influence any spectral fitting results.
 
 We can plot the response function outputs similar to any other normal way in Python. Here we use the `output` example from earlier and we assume this was for an optic's effective area:
 

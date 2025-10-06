@@ -45,14 +45,14 @@ class Response2DOutput(BaseOutput):
     # any other fields needed can be added here
     # can even add with a default so the input is not required for every other instance
 
-def foxsi4_telescope_response(arf_response, rmf_response):
-    """Full Detector Response Matrix (DRM) for a given telescope.
+def foxsi4_telescope_spectral_response(arf_response, rmf_response):
+    """Full Spectral Response Matrix (SRM) for a given telescope.
 
     This function will check the Ancillary Response Function (ARF) 
     `mid_energies` field and the Redistribution Matrix Function (RMF) 
     `input_energy_edges` field mid-points to check they match before 
-    combining both the ARF and RMF into the Detector Response Matrix 
-    (DRM).
+    combining both the ARF and RMF into the Spectral Response Matrix 
+    (SRM).
 
     This function will check both the ARF and RMF have come from the 
     same telescope using the "telescope" field. A warning will be 
@@ -78,7 +78,7 @@ def foxsi4_telescope_response(arf_response, rmf_response):
     # check compatibility
     rmf_mids = (rmf_response.input_energy_edges[:-1]+rmf_response.input_energy_edges[1:])/2
     if not np.all(arf_response.mid_energies==rmf_mids):
-        raise ValueError(f"In {sys._getframe().f_code.co_name}, the `arf_response.mid_energies` do not match the bin centers of `rmf_response.input_energy_edges`.\nDRM product cannot be calculated")
+        raise ValueError(f"In {sys._getframe().f_code.co_name}, the `arf_response.mid_energies` do not match the bin centers of `rmf_response.input_energy_edges`.\nSRM product cannot be calculated")
     
     if arf_response.telescope!=rmf_response.telescope:
         logging.warning(f"In {sys._getframe().f_code.co_name}, the \"telescope\" fields from `arf_response` ({arf_response.telescope}) and `rmf_response` ({rmf_response.telescope}) do not match.\nAn output shall be produced if possible (check the returned objects\"telescope\" field) but the user should be cautious.")
@@ -94,7 +94,7 @@ def foxsi4_telescope_response(arf_response, rmf_response):
                             input_energy_edges=rmf_response.input_energy_edges,
                             output_energy_edges=rmf_response.output_energy_edges,
                             response=total_response,
-                            response_type="DRM",
+                            response_type="SRM",
                             telescope=f"ARF:{arf_response.telescope},RMF:{arf_response.telescope}",
                             elements=(arf_response,
                                       rmf_response,
@@ -791,7 +791,7 @@ def asset_response_chain_plot(save_location=None):
         pos_rmf = pos2rmffunc[key](region=0)
         mid_energies = (pos_rmf.input_energy_edges[:-1]+pos_rmf.input_energy_edges[1:])/2
         pos_arf = pos2arffunc[key](mid_energies=mid_energies, off_axis_angle=off_axis_angle)
-        pos_drm = foxsi4_telescope_response(pos_arf, pos_rmf)
+        pos_srm = foxsi4_telescope_spectral_response(pos_arf, pos_rmf)
 
         gs_ax0 = fig.add_subplot(gs[c, 0])
         gs_ax0.plot(pos_arf.mid_energies, pos_arf.response)
@@ -815,19 +815,19 @@ def asset_response_chain_plot(save_location=None):
         gs_ax1.set_title(f"Pos. {key}: RMF")
 
         gs_ax2 = fig.add_subplot(gs[c, 2])
-        r = gs_ax2.imshow(pos_drm.response.value, 
+        r = gs_ax2.imshow(pos_srm.response.value, 
                         origin="lower", 
                         norm=LogNorm(vmin=0.001), 
-                        extent=[np.min(pos_drm.output_energy_edges.value), 
-                                np.max(pos_drm.output_energy_edges.value), 
-                                np.min(pos_drm.input_energy_edges.value), 
-                                np.max(pos_drm.input_energy_edges.value)]
+                        extent=[np.min(pos_srm.output_energy_edges.value), 
+                                np.max(pos_srm.output_energy_edges.value), 
+                                np.min(pos_srm.input_energy_edges.value), 
+                                np.max(pos_srm.input_energy_edges.value)]
                         )
         cbar = plt.colorbar(r)
-        cbar.ax.set_ylabel(f"Response [{pos_drm.response.unit:latex}]")
-        gs_ax2.set_xlabel(f"Count Energy [{pos_drm.output_energy_edges.unit:latex}]")
-        gs_ax2.set_ylabel(f"Photon Energy [{pos_drm.input_energy_edges.unit:latex}]")
-        gs_ax2.set_title(f"Pos. {key}: DRM")
+        cbar.ax.set_ylabel(f"Response [{pos_srm.response.unit:latex}]")
+        gs_ax2.set_xlabel(f"Count Energy [{pos_srm.output_energy_edges.unit:latex}]")
+        gs_ax2.set_ylabel(f"Photon Energy [{pos_srm.input_energy_edges.unit:latex}]")
+        gs_ax2.set_title(f"Pos. {key}: SRM")
     plt.tight_layout()
     if save_location is not None:
         pathlib.Path(save_location).mkdir(parents=True, exist_ok=True)
