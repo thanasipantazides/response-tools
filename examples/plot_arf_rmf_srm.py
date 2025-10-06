@@ -192,7 +192,7 @@ gs_ax0 = fig.add_subplot(gs[0, 0])
 gs_ax0.plot(pos_arf.mid_energies, pos_arf.response)
 gs_ax0.set_xlabel(f"Photon Energy [{pos_arf.mid_energies.unit:latex}]")
 gs_ax0.set_ylabel(f"Response [{pos_arf.response.unit:latex}]")
-gs_ax0.set_title(f"Telescope 2: ARF")
+gs_ax0.set_title(f"{pos_arf.response_type}:: {pos_arf.telescope}")
 
 # the RMF result (2D) and general plotting code
 gs_ax1 = fig.add_subplot(gs[0, 1])
@@ -208,7 +208,7 @@ cbar = plt.colorbar(r)
 cbar.ax.set_ylabel(f"Response [{pos_rmf.response.unit:latex}]")
 gs_ax1.set_xlabel(f"Count Energy [{pos_rmf.output_energy_edges.unit:latex}]")
 gs_ax1.set_ylabel(f"Photon Energy [{pos_rmf.input_energy_edges.unit:latex}]")
-gs_ax1.set_title(f"Telescope 2: RMF")
+gs_ax1.set_title(f"{pos_rmf.response_type}:: {pos_rmf.telescope}")
 
 # the SRM result (2D) and general plotting code
 gs_ax2 = fig.add_subplot(gs[0, 2])
@@ -224,7 +224,7 @@ cbar = plt.colorbar(r)
 cbar.ax.set_ylabel(f"Response [{pos_srm.response.unit:latex}]")
 gs_ax2.set_xlabel(f"Count Energy [{pos_srm.output_energy_edges.unit:latex}]")
 gs_ax2.set_ylabel(f"Photon Energy [{pos_srm.input_energy_edges.unit:latex}]")
-gs_ax2.set_title(f"Telescope 2: SRM")
+gs_ax2.set_title(f"{pos_srm.response_type}:: {pos_srm.telescope}")
 
 plt.tight_layout()
 plt.show()
