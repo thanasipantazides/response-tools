@@ -1,10 +1,10 @@
 """
-Generating and plotting ARFs, RMFs, and DRMs
+Generating and plotting ARFs, RMFs, and SRMs
 ============================================
 
 Script showing a quick example how to plot the Ancillary Response 
-Function (ARF), Redistribution Matrix Function (RMF), and the Detector 
-Response Matrix (DRM) of a FOXSI-4 telescope.
+Function (ARF), Redistribution Matrix Function (RMF), and the Spectral 
+Response Matrix (SRM) of a FOXSI-4 telescope.
 
 The chosen telescope is Telescope 2 with photon path:
 
@@ -108,7 +108,7 @@ import response_tools.responses as responses
 # 
 # * at 0 arc-minutes, region-0, a pitch of 60 um.
 
-# set up the ARF with the RMF information then make the DRM
+# set up the ARF with the RMF information then make the SRM
 user_off_axis_angle = 0 << u.arcmin
 user_region = 0 # equivalent to defining ``user_pitch=60<<u.um``
 
@@ -141,7 +141,7 @@ pos_arf = responses.foxsi4_telescope2_arf(mid_energies=rmf_mid_energies,
                                           off_axis_angle=user_off_axis_angle)
 
 # %%
-# Generating the DRM
+# Generating the SRM
 # ~~~~~~~~~~~~~~~~~~
 #
 # The user can then combine the ARF and RMF into one product describing 
@@ -150,11 +150,11 @@ pos_arf = responses.foxsi4_telescope2_arf(mid_energies=rmf_mid_energies,
 # Of course, the user can do this step manually; however, the codebase 
 # provides a functions to make sure sensible things are happening:
 
-pos_drm = responses.foxsi4_telescope_response(pos_arf, pos_rmf)
+pos_srm = responses.foxsi4_telescope_spectral_response(pos_arf, pos_rmf)
 
 # %%
-# The ``response_tools.responses.foxsi4_telescope_response`` function 
-# will check:
+# The ``response_tools.responses.foxsi4_telescope_spectral_response`` 
+# function will check:
 # 
 # * The ARF and RMF objects share the same telescope information via their ``telescope`` field.
 #
@@ -168,7 +168,7 @@ pos_drm = responses.foxsi4_telescope_response(pos_arf, pos_rmf)
 # Plotting response products
 # --------------------------
 #
-# Likely, a user will be happy just getting the ARF, RMF, and DRM and 
+# Likely, a user will be happy just getting the ARF, RMF, and SRM and 
 # will be on their way to do science (e.g., spectral fitting) with the 
 # product.
 #
@@ -210,21 +210,21 @@ gs_ax1.set_xlabel(f"Count Energy [{pos_rmf.output_energy_edges.unit:latex}]")
 gs_ax1.set_ylabel(f"Photon Energy [{pos_rmf.input_energy_edges.unit:latex}]")
 gs_ax1.set_title(f"Telescope 2: RMF")
 
-# the DRM result (2D) and general plotting code
+# the SRM result (2D) and general plotting code
 gs_ax2 = fig.add_subplot(gs[0, 2])
-r = gs_ax2.imshow(pos_drm.response.value, 
+r = gs_ax2.imshow(pos_srm.response.value, 
                 origin="lower", 
                 norm=LogNorm(vmin=0.001), 
-                extent=[np.min(pos_drm.output_energy_edges.value), 
-                        np.max(pos_drm.output_energy_edges.value), 
-                        np.min(pos_drm.input_energy_edges.value), 
-                        np.max(pos_drm.input_energy_edges.value)]
+                extent=[np.min(pos_srm.output_energy_edges.value), 
+                        np.max(pos_srm.output_energy_edges.value), 
+                        np.min(pos_srm.input_energy_edges.value), 
+                        np.max(pos_srm.input_energy_edges.value)]
                 )
 cbar = plt.colorbar(r)
-cbar.ax.set_ylabel(f"Response [{pos_drm.response.unit:latex}]")
-gs_ax2.set_xlabel(f"Count Energy [{pos_drm.output_energy_edges.unit:latex}]")
-gs_ax2.set_ylabel(f"Photon Energy [{pos_drm.input_energy_edges.unit:latex}]")
-gs_ax2.set_title(f"Telescope 2: DRM")
+cbar.ax.set_ylabel(f"Response [{pos_srm.response.unit:latex}]")
+gs_ax2.set_xlabel(f"Count Energy [{pos_srm.output_energy_edges.unit:latex}]")
+gs_ax2.set_ylabel(f"Photon Energy [{pos_srm.input_energy_edges.unit:latex}]")
+gs_ax2.set_title(f"Telescope 2: SRM")
 
 plt.tight_layout()
 plt.show()
@@ -232,4 +232,4 @@ plt.show()
 # %%
 # We can see how the ARF (left panel) and RMF (middle panel) are 
 # combined where the photon energy rows of the RMF array are multiplied 
-# by the ARF array producing the DRM (right panel).
+# by the ARF array producing the SRM (right panel).

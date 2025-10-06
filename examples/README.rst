@@ -14,10 +14,10 @@ Data handling examples
 Plotting examples
 -----------------
 
-* **Generating and plotting ARFs, RMFs, and DRMs**
+* **Generating and plotting ARFs, RMFs, and SRMs**
 
-  * File: ``plot_arf_rmf_drm.py``.
-  * Shows how to obtain and plot the ARF, RMF, and DRM for Telescope 2.
+  * File: ``plot_arf_rmf_srm.py``.
+  * Shows how to obtain and plot the ARF, RMF, and SRM for Telescope 2.
 
 Whole example gallery
 ---------------------

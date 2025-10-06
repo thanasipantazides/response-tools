@@ -59,8 +59,8 @@ import numpy as np
 # The `responses` module will contains functions that combine the 
 # relevant `telescope_parts` functions into one to return higher level 
 # products such as the telescope's Ancillary Response Function (ARF), 
-# Redistribution Matrix Function (RMF), and/or Detector Response Matrix 
-# (DRM).
+# Redistribution Matrix Function (RMF), and/or Spectral Response Matrix 
+# (SRM).
 
 import response_tools.responses as responses
 import response_tools.telescope_parts as telescope_parts
@@ -155,8 +155,8 @@ print(pos2_optics.effective_areas)
 # The `telescope_parts.foxsi4_position2_optics` function is helpful but 
 # an even higher level exists that will allow a user to specify a 
 # FOXSI-4 telescope to obtain the Ancillary Response Function (ARF), 
-# Redistribution Matrix Function (RMF), and/or Detector Response Matrix 
-# (DRM).
+# Redistribution Matrix Function (RMF), and/or Spectral Response Matrix 
+# (SRM).
 # 
 # First, we can get the RMF for a telescope, say, Telescope 2 to be 
 # consistent with using position 2's components previously. 
@@ -181,10 +181,11 @@ tel2_arf = responses.foxsi4_telescope2_arf(mid_energies=mid_energies,
 
 # %%
 # Once we have the RMF and ARF for a given instrument, you might want to 
-# just see what the total DRM is. This can be done by passing the ARF 
-# and RMF to the general `responses.foxsi4_telescope_response` function:
+# just see what the total SRM is. This can be done by passing the ARF 
+# and RMF to the general `responses.foxsi4_telescope_spectral_response` 
+# function:
 
-tel2_drm = responses.foxsi4_telescope_response(tel2_arf, tel2_rmf)
+tel2_srm = responses.foxsi4_telescope_spectral_response(tel2_arf, tel2_rmf)
 
 # %%
 # Note that with the FOXSI-4 Telescope fucntions (`foxsi4_telescope*`), 
