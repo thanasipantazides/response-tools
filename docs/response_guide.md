@@ -44,7 +44,7 @@ The SRM describes the total response of the telescope in question. It takes into
 
 The SRM is the combination of the ARF and RMF:
 
-```math
+```{math}
 SRM = ARF \times RMF \quad \textrm{and} \quad SRM_{a, b} = ARF_{a}*RMF_{a,b}
 ```
 
@@ -54,11 +54,15 @@ Using the SRM, a user can perform a variety of scientific analysis, such as forw
 
 For example, for forward fitting, if a user has a model photon spectrum ($M_{photon}$) evaluated for the SRM input energy bins then they are able to obtain a model telescope observable spectrum (e.g., a count or DN spectrum):
 
-```math
+```{math}
 M_{observable} = M_{photon} \# SRM \quad \textrm{and} \quad M_{observable, b} = \sum_{a=0}^{n} M_{photon, a} \cdot SRM_{a, b}
 ```
 
-where $M_{observable}$ is the model observable spectrum that can be compared to the measured observable spectrum from, say, the flight.
+where $M_{observable}$ is the model observable spectrum that can be compared to the measured observable spectrum from, say, the flight. A user can make use of spectral fitting software for this analysis:
+
+- [Sunkit-spex](https://github.com/sunpy/sunkit-spex) (`Python`)
+- [OSPEX](https://hesperia.gsfc.nasa.gov/ssw/packages/spex/doc/ospex_explanation.htm) (`IDL`)
+- [XSPEC](https://heasarc.gsfc.nasa.gov/docs/software/xspec/) (Multiple interfaces)
 
 An example of Telescope 2's ARF, RMF, and SRM is given below to show how the two former elements are combined into the latter (see the [Generating and plotting ARFs, RMFs, and SRMs](https://foxsi.github.io/response-tools/auto_examples/plot_arf_rmf_srm.html#sphx-glr-auto-examples-plot-arf-rmf-srm-py) example in the example gallery).
 
