@@ -101,6 +101,60 @@ def foxsi4_telescope_spectral_response(arf_response, rmf_response):
                                       ),
                             )
 
+# telescope 0
+@u.quantity_input(pitch=u.um)
+def foxsi4_telescope0_rmf():
+    """The Redistribution Matrix Function (RMF) for Telescope 0. 
+
+    Returns
+    -------
+    : `responses.Response2DOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+    
+    rmf = tp.foxsi4_position1_detector_response()
+    func_name = sys._getframe().f_code.co_name
+    rmf.update_function_path(func_name)
+
+    return Response2DOutput(filename="No-File",
+                            function_path=func_name,
+                            input_energy_edges=rmf.input_energy_edges,
+                            output_energy_edges=rmf.output_energy_edges,
+                            response=rmf.detector_response,
+                            response_type="RMF",
+                            telescope="foxsi4-telescope1",
+                            elements=(rmf,
+                                      ),
+                            )
+
+# telescope 1
+@u.quantity_input(pitch=u.um)
+def foxsi4_telescope0_rmf():
+    """The Redistribution Matrix Function (RMF) for Telescope 0. 
+
+    Returns
+    -------
+    : `responses.Response2DOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+    
+    rmf = tp.foxsi4_position0_detector_response()
+    func_name = sys._getframe().f_code.co_name
+    rmf.update_function_path(func_name)
+
+    return Response2DOutput(filename="No-File",
+                            function_path=func_name,
+                            input_energy_edges=rmf.input_energy_edges,
+                            output_energy_edges=rmf.output_energy_edges,
+                            response=rmf.detector_response,
+                            response_type="RMF",
+                            telescope="foxsi4-telescope0",
+                            elements=(rmf,
+                                      ),
+                            )
+
 # telescope 2
 @u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
 def foxsi4_telescope2_arf(mid_energies, off_axis_angle):
