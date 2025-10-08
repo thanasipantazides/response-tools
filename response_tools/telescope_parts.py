@@ -21,12 +21,52 @@ from response_tools.effective_area import (eff_area_msfc_10shell,
 # position 0
 @u.quantity_input(mid_energies=u.keV)
 def foxsi4_position0_obf(mid_energies):
+    # still to come...
     pass
+
+@u.quantity_input(pitch=u.um)
+def foxsi4_position0_detector_response():
+    """Position 0 CMOS1 detector response.
+
+    Returns
+    -------
+    : `detector_response.DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+    
+    pos0_det = 0
+    r = cmos_det_resp(telescope=pos0_det)
+    if r is None:
+        return
+    r.update_function_path(sys._getframe().f_code.co_name)
+    r.detector = f"CMOS{pos0_det}-Detector-Response"
+    return r
 
 # position 1
 @u.quantity_input(mid_energies=u.keV)
 def foxsi4_position1_obf(mid_energies):
+    # still to come...
     pass
+
+@u.quantity_input(pitch=u.um)
+def foxsi4_position1_detector_response():
+    """Position 1 CMOS2 detector response.
+
+    Returns
+    -------
+    : `detector_response.DetectorResponseOutput`
+        An object containing all the redistribution matrix information. 
+        See accessible information using `.contents` on the output.
+    """
+    
+    pos1_det = 1
+    r = cmos_det_resp(telescope=pos1_det)
+    if r is None:
+        return
+    r.update_function_path(sys._getframe().f_code.co_name)
+    r.detector = f"CMOS{pos1_det}-Detector-Response"
+    return r
 
 # position 2
 @u.quantity_input(mid_energies=u.keV)
