@@ -13,8 +13,9 @@
 import os
 import pathlib
 import sys
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath(".."))   
 
+this_folder = os.path.dirname(__file__)
 
 # -- Project information -----------------------------------------------------
 
@@ -61,11 +62,16 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 #
 html_theme = "sphinx_rtd_theme"
 html_logo = "Glyph_FOXSI4_text.png"
+html_favicon = "Glyph_FOXSI4_favicon.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = [os.path.join(this_folder, "styles")]
+
+html_css_files = [
+    os.path.join(this_folder, "styles", "svg_width_style.css")
+]
 
 sphinx_gallery_conf = {
      "examples_dirs": "../examples",   # path to your example scripts
