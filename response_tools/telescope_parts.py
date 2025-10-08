@@ -5,9 +5,12 @@ import sys
 
 import astropy.units as u
 
-from response_tools.attenuation import (att_thermal_blanket,
+from response_tools.attenuation import (att_al_mylar,
+                                        att_cmos_collimator_ratio,
+                                        att_cmos_filter,
+                                        att_cmos_obfilter,
                                         att_pixelated, 
-                                        att_al_mylar,
+                                        att_thermal_blanket,
                                         att_uniform_al_cdte
                                         )
 from response_tools.detector_response import (cdte_det_resp, 
@@ -16,13 +19,111 @@ from response_tools.detector_response import (cdte_det_resp,
 from response_tools.effective_area import (eff_area_msfc_10shell,
                                            eff_area_msfc_hi_res,
                                            eff_area_nagoya_hxt,
+                                           eff_area_nagoya_sxt,
                                            )
 
 # position 0
 @u.quantity_input(mid_energies=u.keV)
+def foxsi4_position0_prefilter(mid_energies):
+    """Position 0 pre-filter for the optics.
+
+    Parameters
+    ----------
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the pre-filter transmission is required. 
+        If `numpy.nan<<astropy.units.keV` is passed then an entry for 
+        all native file energies are returned. 
+        Unit must be convertable to keV.
+
+    Returns
+    -------
+    : `attenuation.AttOutput`
+        An object containing the attenuation/transmission information of
+        the pre-filter. See accessible information using `.contents` on 
+        the output.
+    """
+    pos0_det = 0
+    r = att_cmos_filter(mid_energies, telescope=pos0_det)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
+
+@u.quantity_input(off_axis_angle=u.arcmin)
+def foxsi4_position0_collimator(off_axis_angle):
+    """Position 0 collimator for the optics.
+
+    Parameters
+    ----------
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+
+    Returns
+    -------
+    : `attenuation.AttOutput`
+        An object containing the collimator ratio. See accessible 
+        information using `.contents` on the output.
+    """
+    pos0_det = 0
+    r = att_cmos_collimator_ratio(off_axis_angle, telescope=pos0_det)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
+
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def foxsi4_position0_optics(mid_energies, off_axis_angle=None):
+    """Position 0 MSFC high resolution optic effective areas.
+
+    Parameters
+    ----------
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the position 0 optics is required. If 
+        `numpy.nan<<astropy.units.keV` is passed then an entry for all 
+        native file energies are returned. 
+        Unit must be convertable to keV.
+
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
+
+    Returns
+    -------
+    : `effective_area.EffAreaOutput`
+        An object containing the effective area information of the MSFC 
+        high resolution optic. See accessible information using 
+        `.contents` on the output.
+    """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for Position 0's optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
+    r = eff_area_msfc_hi_res(mid_energies, 
+                             off_axis_angle=off_axis_angle,
+                             position=0, 
+                             use_model=True)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
+
+@u.quantity_input(mid_energies=u.keV)
 def foxsi4_position0_obf(mid_energies):
-    # still to come...
-    pass
+    """Position 0 optical blocking filter for the detector.
+
+    Parameters
+    ----------
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the OBF transmission is required. If 
+        `numpy.nan<<astropy.units.keV` is passed then an entry for all 
+        native file energies are returned. 
+        Unit must be convertable to keV.
+
+    Returns
+    -------
+    : `attenuation.AttOutput`
+        An object containing the attenuation/transmission information of
+        the OBF. See accessible information using `.contents` on the 
+        output.
+    """
+    pos0_det = 0
+    r = att_cmos_obfilter(mid_energies, telescope=pos0_det)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
 
 @u.quantity_input(pitch=u.um)
 def foxsi4_position0_detector_response():
@@ -45,9 +146,105 @@ def foxsi4_position0_detector_response():
 
 # position 1
 @u.quantity_input(mid_energies=u.keV)
+def foxsi4_position1_prefilter(mid_energies):
+    """Position 1 pre-filter for the optics.
+
+    Parameters
+    ----------
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the pre-filter transmission is required. 
+        If `numpy.nan<<astropy.units.keV` is passed then an entry for 
+        all native file energies are returned. 
+        Unit must be convertable to keV.
+
+    Returns
+    -------
+    : `attenuation.AttOutput`
+        An object containing the attenuation/transmission information of
+        the pre-filter. See accessible information using `.contents` on 
+        the output.
+    """
+    pos1_det = 1
+    r = att_cmos_filter(mid_energies, telescope=pos1_det)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
+
+@u.quantity_input(off_axis_angle=u.arcmin)
+def foxsi4_position1_collimator(off_axis_angle):
+    """Position 1 collimator for the optics.
+
+    Parameters
+    ----------
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+
+    Returns
+    -------
+    : `attenuation.AttOutput`
+        An object containing the collimator ratio. See accessible 
+        information using `.contents` on the output.
+    """
+    pos1_det = 1
+    r = att_cmos_collimator_ratio(off_axis_angle, telescope=pos1_det)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
+
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def foxsi4_position1_optics(mid_energies, off_axis_angle=None):
+    """Position 1 Nagoya high resolution optic effective areas.
+
+    Parameters
+    ----------
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the position 1 optics is required. If 
+        `numpy.nan<<astropy.units.keV` is passed then an entry for all 
+        native file energies are returned. 
+        Unit must be convertable to keV.
+
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
+
+    Returns
+    -------
+    : `effective_area.EffAreaOutput`
+        An object containing the effective area information of the 
+        Nagoya high resolution optic. See accessible information using 
+        `.contents` on the output.
+    """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for Position 1's optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
+    r = eff_area_nagoya_sxt(mid_energies, 
+                            off_axis_angle=off_axis_angle,
+                            use_model=True)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
+
+@u.quantity_input(mid_energies=u.keV)
 def foxsi4_position1_obf(mid_energies):
-    # still to come...
-    pass
+    """Position 1 optical blocking filter for the detector.
+
+    Parameters
+    ----------
+    mid_energies : `astropy.units.quantity.Quantity`
+        The energies at which the OBF transmission is required. If 
+        `numpy.nan<<astropy.units.keV` is passed then an entry for all 
+        native file energies are returned. 
+        Unit must be convertable to keV.
+
+    Returns
+    -------
+    : `attenuation.AttOutput`
+        An object containing the attenuation/transmission information of
+        the OBF. See accessible information using `.contents` on the 
+        output.
+    """
+    pos1_det = 1
+    r = att_cmos_obfilter(mid_energies, telescope=pos1_det)
+    r.update_function_path(sys._getframe().f_code.co_name)
+    return r
 
 @u.quantity_input(pitch=u.um)
 def foxsi4_position1_detector_response():

@@ -318,8 +318,8 @@ def eff_area_nagoya_hxt(mid_energies, off_axis_angle=None, use_model=False, file
                          model=use_model,
                          )
 
-@u.quantity_input(mid_energies=u.keV)
-def eff_area_nagoya_sxt(mid_energies, use_model=False, file=None):
+@u.quantity_input(mid_energies=u.keV, off_axis_angle=u.arcmin)
+def eff_area_nagoya_sxt(mid_energies, off_axis_angle=None, use_model=False, file=None):
     """Nagoya SXR hi-res effective areas interpolated to given energies.
     
     Includes the collimator and OBF too.
@@ -331,6 +331,11 @@ def eff_area_nagoya_sxt(mid_energies, use_model=False, file=None):
         `numpy.nan<<astropy.units.keV` is passed then an entry for all 
         native file energies are returned. 
         Unit must be convertable to keV.
+
+    off_axis_angle : `astropy.units.quantity.Quantity`
+        The off-axis angle of the source.
+        Unit must be convertable to arc-minutes.
+        *** Not implemented yet. ***
 
     use_model : `bool`
         Defines whether to use the measured values for the optic (False)
@@ -348,6 +353,8 @@ def eff_area_nagoya_sxt(mid_energies, use_model=False, file=None):
         effective areas, and more. See accessible information using 
         `.contents` on the output.
     """
+    if off_axis_angle is not None:
+        logging.warning(f"The `off_axis_angle` input for Nagoya high-resolution optics ({sys._getframe().f_code.co_name}) is not yet implemented.")
     # nagoya sxr effective areas
     if not use_model:
         _f = os.path.join(FILE_PATH, RESPONSE_INFO_TYPE["eff_area_measured_nagoya_sxt"]) if file is None else file
