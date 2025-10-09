@@ -95,7 +95,7 @@ def foxsi4_telescope_spectral_response(arf_response, rmf_response):
                             output_energy_edges=rmf_response.output_energy_edges,
                             response=total_response,
                             response_type="SRM",
-                            telescope=f"ARF:{arf_response.telescope},RMF:{arf_response.telescope}",
+                            telescope=f"ARF:{arf_response.telescope},RMF:{rmf_response.telescope}",
                             elements=(arf_response,
                                       rmf_response,
                                       ),
