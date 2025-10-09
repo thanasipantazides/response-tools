@@ -31,7 +31,7 @@ and `RMF <https://foxsi.github.io/response-tools/response_guide.html#what-is-a-r
 for each telescope is linked in the diagram, along the bottom. 
 
 If desired, you can also access the response for individual components of each telescope
-(each boxe in the above diagram). The links in each box point to API documentation for 
+(each box in the above diagram). The links in each box point to API documentation for 
 retrieving the components of each telescope's response. 
 
 FOXSI-4 telescopes
