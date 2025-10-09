@@ -40,23 +40,23 @@ FOXSI-4 telescopes
 If you’d like to do some analysis on FOXSI-4 data, which telescope(s)
 should you use? This table may help you make up your mind:
 
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| Telescope | Detector           | Optics           | Collimator      | Attenuation                 | Energy range        | Energy resolution | Spatial resolution (FWHM) |
-+===========+====================+==================+=================+=============================+=====================+===================+===========================+
-| **0**     | CMOS               | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| **1**     | CMOS               | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| **2**     | CdTe DSD           | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| **3**     | CdTe DSD           | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| **4**     | CdTe DSD           | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| **5**     | CdTe DSD           | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
-| **6**     | Timepix [1]_       | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter             | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
-+-----------+--------------------+------------------+-----------------+-----------------------------+---------------------+-------------------+---------------------------+
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| Telescope | Detector           | Optics           | Collimator      | Attenuation                  | Energy range        | Energy resolution | Spatial resolution (FWHM) |
++===========+====================+==================+=================+==============================+=====================+===================+===========================+
+| **0**     | CMOS               | MSFC 2-shell     | AR = 1:290      | OBF + Prefilter              | 0.8–10 keV          | 0.4 @ 10 keV      | 3.4"                      |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| **1**     | CMOS               | Nagoya 1-shell   | AR = 1:200      | OBF + Prefilter              | 0.8–10 keV          | 0.4 @ 10 keV      | 1.5"                      |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| **2**     | CdTe DSD           | MSFC 10-shell    | ---             |  381 µm Al                   | 4–20 keV            | 0.8 @ 14 keV      | 7.2–11.4"                 |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| **3**     | CdTe DSD           | MSFC 2-shell     | ---             | Pixelated attenuator + Mylar | 4–20 keV            | 0.8 @ 14 keV      | 6.1–10.8"                 |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| **4**     | CdTe DSD           | Nagoya 1-shell   | ---             | 127 µm Al                    | 4–20 keV            | 0.8 @ 14 keV      | 5.3–10.3"                 |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| **5**     | CdTe DSD           | MSFC 10-shell    | ---             | Pixelated attenuator + Mylar | 4–20 keV            | 0.8 @ 14 keV      | 7.2–11.4"                 |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
+| **6**     | Timepix [1]_       | MSFC 2-shell     | ---             | Mylar                        | 5–20 keV            | 6 @ 60 keV        | 6.9""                     |
++-----------+--------------------+------------------+-----------------+------------------------------+---------------------+-------------------+---------------------------+
 
 You may have an idea of which FOXSI-4 telescopes you’d like to use for
 analysis. To work with per-telescope response products, you can use the
@@ -133,32 +133,57 @@ a modeled transmission curve.
 Filters and other attenuators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-X-ray flux is attenuated along each telescope's optical path by a variety of monolithic 
-filters:
+X-ray flux is attenuated along each telescope's optical path by a variety of monolithic filters:
 
 * Thin, metalized foil filters in the CMOS detectors' optical paths. 
-    These are used to prevent visible light from contaminating the detector. These are 
-    referred to as the OBFs (for optical-blocking filter) and prefilters.
+    These are used to prevent visible light from contaminating the detector. These are referred to as the OBFs (for optical-blocking filter) and prefilters.
 
 * Aluminized Mylar filters in front of the position 3 and 5 CdTe detectors. 
-    These have have a small impact on the transmission for telescopes 3 and 5, 
-    they are included primarily to protect the detector surface during integration.
+    These have have a small impact on the transmission for telescopes 3 and 5, they are included primarily to protect the detector surface during integration.
 
 * Thin aluminum filters in front of the position 2 and 4 CdTe detectors. 
-    These are included to bring the observed count rate into an acceptable range for the 
-    CdTe detectors.
+    These are included to bring the observed count rate into an acceptable range for the CdTe detectors.
 
 * Multilayer insulation (MLI) blankets in front of the position 2–6 optics. 
-    These blankets shield the optic modules from intense infrared radiation and heating; 
-    they transmit X-rays well.
+    These blankets shield the optic modules from intense infrared radiation and heating; they transmit X-rays well.
 
-    A sample of this blanket material was measured in the lab post-flight. Its transmission
-    was consistent with models, the API in this package reports the modeled value.
+..    A sample of this blanket material was measured in the lab post-flight. Its transmission was consistent with models, the API in this package reports the modeled value.
 
 Detectors
 ~~~~~~~~~
 
-Oh boy.
+Three types of detectors were flown on FOXSI-4:
+
+#. CMOS soft X-ray detectors in positions 0 and 1,
+#. CdTe double-sided strip detectors in positions 2–5,
+#. Timepix detector in position 6 [1]_.
+
+The following table summarizes the characteristics of each detector:
+
++-----------+---------------+-----------------------+-----------+
+| Detector  | Energy range  | Energy resolution     | Pitch     |
++===========+===============+=======================+===========+
+| CMOS      | 0.8–10 keV    | 0.4 @ 10 keV          | 11 µm     |
++-----------+---------------+-----------------------+-----------+
+| CdTe      | 4–20 keV      | 0.8 @ 14 keV          | 60–100 µm |
++-----------+---------------+-----------------------+-----------+
+| Timepix   |6–20 keV       | 6 @ 60 keV            | 55 µm     |
++-----------+---------------+-----------------------+-----------+
+
+Prior to the flight, all detectors underwent calibration campaigns 
+involving sealed radioactive sources [6]_ and beamline testing [7]_. 
+
+For the CMOS detectors, the response information made available 
+through this package was constructed from experimental data taken 
+with a representative detector. The detector used to construct the 
+response was not flown on FOXSI-4; the detector response is applied 
+to the CMOS detectors in positions 0 and 1 identically.
+
+For the CdTe detectors, the response information available through
+this package was constructed from experimental data taken with each
+specific detector. The response for CdTe1–CdTe4 is unique to that
+detector.
+
 
 
 .. [1]
@@ -175,3 +200,10 @@ Oh boy.
 
 .. [5]
    See Sato et al. 2024, DOI: 10.1117/12.3018219
+
+.. [6]
+   See Minami et al. 2024, DOI: 10.1117/12.3018742   
+
+.. [7]
+   See Shimizu et al. 2024, DOI: 10.1117/12.3017009
+   
