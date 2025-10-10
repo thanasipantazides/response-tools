@@ -2,7 +2,7 @@
 
 Repository to manage response elements, originally for the FOXSI-4 sounding rocket mission and it can be extended.
 
-**Note:** This repositiory can be extanded to any other instrument (e.g., FOXSI-1, -2, and -3) but only currently supports FOXSI-4 use.
+**Note:** This repository can be extended to any other instrument (e.g., FOXSI-1, -2, and -3) but only currently supports FOXSI-4 use.
 
 ## Setting up the code
 
@@ -52,9 +52,9 @@ Any time the code is updated and, say, you pull/download it from Github, make su
 
 ## Getting the response files
 
-The code lives somewhere in the University of Minnesota. A user can either:
+The response files live somewhere in the University of Minnesota. A user can either:
 
-- Use their own methods to trek through the data-file storage themselves and navigate the plethora of different file formats, standards, personal choices; or,
+- Use their own methods to trek through the data storage themselves and navigate the plethora of different file formats, standards, personal choices; or,
 - Use a Python interface developed to download the files.
 
 ### Where the data lives
@@ -131,19 +131,26 @@ If you are thinking about contributing to the repository, thank you so much for 
 
 Any help would be appreciated and can come in the form of contributing code, fixing bugs, or pointing out errors or places for improvement via [Pull Requests](https://github.com/foxsi/response-tools/pulls) and [Issues](https://github.com/foxsi/response-tools/issues).
 
-In order to contribute code, we ask that you first create your own fork of the repository and then clone that fork to your local machine. Branches of your new fork can be created to develop new features or fix bugs (exciting!). When you are happy with the code in that new branch, a pull request (PR) can be opened which aims to merge the code in your fork's branch into the `main` `foxsi/response-tools` repository. A lot of discussion can be facilitated in an open PR.
+In order to contribute code, we ask that you first [create your own fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) of the repository and then clone that fork to your local machine. Branches of your new fork can be created to develop new features or fix bugs (exciting!). When you are happy with the code in that new branch, [a pull request (PR) can be opened](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) which aims to merge the code in your fork's branch into the `main` `foxsi/response-tools` repository. A lot of discussion can be facilitated in an open PR.
 
 **Note:** We _never_ `push` to this repository directly. If this happens then it can be very difficult for other contributers to understand what changes are being made and how it affects their own PRs. _If the repository is pushed to directly, in order to help track changes and make them visible to other contributers, the repository will be reverted back to it's state before the push and the undone changes will be asked to be proposed via a PR to then be merged._
 
 ## Versioning
+This software, and the response data files it uses, are versioned with different syntax. If you are interacting with [Response-tools](https://www.github.com/foxsi/response-tools) at a high level, (e.g. [through the Level 3 or Level 2 API](https://foxsi.github.io/response-tools/code.html#api-level-design)), you don't need to worry about individual response file versions.
 
-The versioning approach for all code, files, and data products is [semantic versioning](https://en.wikipedia.org/wiki/Software_versioning#Semantic_versioning).
+### Software versioning
+The versioning approach for this software package is [semantic versioning](https://en.wikipedia.org/wiki/Software_versioning#Semantic_versioning).
 
-This means that we represent the item with one-three digits indicating `major`.`minor`.`patch` changes made. Files will only use the `major` value.
+This means that we represent the item with one-three digits indicating `major`.`minor`.`patch` changes made.
 
 - `major`: Increment to include breaking changes from previous versions.
-  - E.g., the file's data changes or the pre-existing code's behaviour is changed and is no longer backwards compatible.
-- `minor`: Increment to include new additions to the item.
-  - E.g., the file now includes new additional data or the code has new tools.
+  - E.g., the pre-existing code's behaviour is changed and is no longer backwards-compatible.
+- `minor`: Increment to include new additions to the software.
+  - E.g., code has new tools.
 - `patch`: Increment to include all other small changes.
-  - E.g., the file has small details added, like some metadata, or the code has had a couple of small typo fixes.
+  - E.g., the code has had a couple of small typo or bug fixes.
+
+### File versioning
+Response files are versioned using only an integer version number. File versions are updated _any time_ their data content changes (modifications, removals, or additions). The developers of Response-tools keep the available software tools aligned with the available response data. 
+
+Response files may be added as new aspects of the instrument response are understood. Response files may update their version if e.g. improved calibration results are available.
