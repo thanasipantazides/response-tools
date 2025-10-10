@@ -181,8 +181,8 @@ to the CMOS detectors in positions 0 and 1 identically.
 
 For the CdTe detectors, the response information available through
 this package was constructed from experimental data taken with each
-specific detector. The response for CdTe1–CdTe4 is unique to that
-detector.
+specific detector, in combination with GEANT4 simulation. The response 
+for CdTe1–CdTe4 is unique to that detector.
 
 
 
