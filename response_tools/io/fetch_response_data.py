@@ -129,7 +129,37 @@ class DownloadPrompt:
 
 def green_str(text:str):
     return "\033[92m" + text + "\033[0m"
-
+        
+def foxsi4_list_missing_response_info():
+    """Check what needs to be downloaded, according to info.yaml
+    
+    Look at all the required files in info.yaml, and compare to what's on the disk already.
+    
+    Note! Some required downloads are folders, with content which is unknown until we connect to the server. This function will *always* flag these folders for download.
+    """
+    req = load_response_context()
+    server_url = req["remote_server"]
+    # for urllib.parse.urljoin to work correctly, server path prefix must end in `/`:
+    if server_url[-1] != "/":
+        server_url += "/"
+    local_info_dir = os.path.abspath(responseFilePath)
+    files_to_get = []
+    folders_to_get = []
+    for comp_name in req["files"].keys():
+        for ftitle, fname in req["files"][comp_name].items():
+            path,ext = os.path.splitext(fname)
+            if not ext and path[-1] == '/':
+                # this is a folder
+                # ... always add folders to folders_to_get. No way to know if they're full until we read the server.
+                folders_to_get.append(urljoin(server_url, fname))
+            else:
+                # this is a file.
+                # check if it is on the disk already.
+                dest_path = os.path.join(local_info_dir, fname)
+                if not os.path.exists(dest_path):
+                    files_to_get.append(urljoin(server_url, fname))
+    return files_to_get, folders_to_get
+    
 def foxsi4_download_required(replace_existing=False, verbose=False):
     """Download all response component files specified in `response-information/info.yaml`.
 
@@ -160,11 +190,11 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     if replace_existing == True:
         raise NotImplementedError("No support yet for replacement of old file versions.")
 
-    # print if the verbose flag is set:
+
     def verbose_print(*something):
         if verbose:
             print(*something)
-
+            
     req = load_response_context()
     server_url = req["remote_server"]
 
@@ -215,7 +245,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
                 # check if the URL ends in "/" which indicates a folder
                 if f.endswith("/"):
                     # get the contents of the folder
-                    page = requests.get(f).text
+                    page = requests.get(f, timeout=5).text
                     soup = BeautifulSoup(page, 'html.parser')
                     # make sure we extract all the hrefs then check the link has a "." in it for an extension
                     linked_files = [node.get('href') for node in soup.find_all('a') if ("." in node.get('href'))]
@@ -237,4 +267,10 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     return downloaded
 
 if __name__ == "__main__":
-    downloaded = foxsi4_download_required(verbose=True)
+    # downloaded = foxsi4_download_required(verbose=True)
+    files,folders = foxsi4_list_missing_response_info() 
+
+    print("files to get:")
+    print(files)
+    print("folders to get:")
+    print(folders)
