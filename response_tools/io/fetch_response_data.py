@@ -131,11 +131,38 @@ def green_str(text:str):
     return "\033[92m" + text + "\033[0m"
         
 def foxsi4_list_missing_response_info():
-    """Check what needs to be downloaded, according to info.yaml
+    """Check which response files need downloading, according to 
+    ``response-information/info.yaml``.
     
-    Look at all the required files in info.yaml, and compare to what's on the disk already.
+    Look at all the required files in ``info.yaml``, and see which of them are not 
+    already on the local disk.
     
-    Note! Some required downloads are folders, with content which is unknown until we connect to the server. This function will *always* flag these folders for download.
+    .. note:: Folders will always be flagged for download.
+        Some response products are just identified by their folder on the server. 
+        There's no knowing if their contents are already downloaded until we go talk to 
+        the server (which this function does not do).
+    
+    Returns
+    -------
+    A tuple describing two items: ``files_to_get`` and ``folders_to_get``.
+    
+    ``files_to_get`` is a ``dict`` of each file that should be downloaded from the remote server. The keys in this dictionary are the file names from the ``info.yaml`` file. The value for that key is another ``dict``, which contains the remote server path to the file (under the "remote" key) and the local disk path to save the file (under the "local" key). Like this:
+    
+        .. code:: python
+            
+            files_to_get["a_response_file_name"] == {
+                "remote": "http://foxsi.space.umn.edu/data/response/response-components/attenuation-data/a_response_file.fits",
+                "local":  "response-tools/response_tools/response-information/attenuation-data/a_response_file.fits"
+            }
+
+    ``folders_to_get`` is a ``dict`` of each folder that should be downloaded from the remote server. The keys in this dictionary are the folder names from the ``info.yaml`` file. The value for that key is another ``dict``, which contains the remote server path to the folder (under the "remote" key) and the local disk path to save the folder (under the "local" key). Like this:
+    
+        .. code:: python
+            
+            folders_to_get["a_response_folder_name/"] == {
+                "remote": "http://foxsi.space.umn.edu/data/response/response-components/attenuation-data/a_response_folder/",
+                "local":  "response-tools/response_tools/response-information/attenuation-data/a_response_folder/"
+            }
     """
     req = load_response_context()
     server_url = req["remote_server"]
@@ -170,26 +197,26 @@ def foxsi4_list_missing_response_info():
     return files_to_get, folders_to_get
     
 def foxsi4_download_required(replace_existing=False, verbose=False):
-    """Download all response component files specified in `response-information/info.yaml`.
+    """Download all response component files specified in ``response-information/info.yaml``.
 
-        Download data products from a remote server to the local filesystem. Retrieves server
-        URL and all local paths for saving data from a config file:
-        `response-tools/response-information/info.yaml`. All downloaded response data will be
-        saved under `response-tools/response-information`.
+        Download data products from a remote server to the local filesystem. Retrieves 
+        server URL and all local paths for saving data from a config file:
+        ``response-tools/response-information/info.yaml``. All downloaded response data will 
+        be saved under ``response-tools/response-information``.
 
         Parameters
         ----------
-        replace_existing : `bool`
+        replace_existing : ``bool``
             Whether to replace local files with newer versions, if newer versions are
-            downloaded. Currently throws `NotImplementedError`.
+            downloaded. Currently throws ``NotImplementedError``.
 
-        verbose : `bool`
-            Toggle for printing verbosely. If `True`, download progress indicators and
-            filenames are displayed. If `False`, nothing is printed at all.
+        verbose : ``bool``
+            Toggle for printing verbosely. If ``True``, download progress indicators and
+            filenames are displayed. If ``False``, nothing is printed at all.
 
         Returns
         -------
-        : `downloaded`
+        downloaded : ``dict``
             A dict of downloaded data. Keys are the same file identifiers from the YAML
             source. Values are the absolute paths on the local filesystem to the downloaded
             file. Files which were already existed in the local filesystem (required no
@@ -218,7 +245,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
 
     files_to_get, folders_to_get = foxsi4_list_missing_response_info()
     
-    downloaded = {}   
+    downloaded:dict = {}   
     if not files_to_get and not folders_to_get:
         verbose_print("Found nothing new to download")
     else:
