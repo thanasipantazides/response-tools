@@ -143,21 +143,21 @@ def foxsi4_list_missing_response_info():
     if server_url[-1] != "/":
         server_url += "/"
     local_info_dir = os.path.abspath(responseFilePath)
-    files_to_get = []
-    folders_to_get = []
+    files_to_get = {}
+    folders_to_get = {}
     for comp_name in req["files"].keys():
         for ftitle, fname in req["files"][comp_name].items():
             path,ext = os.path.splitext(fname)
             if not ext and path[-1] == '/':
-                # this is a folder
-                # ... always add folders to folders_to_get. No way to know if they're full until we read the server.
-                folders_to_get.append(urljoin(server_url, fname))
+                # this is a folder.
+                # always add folders to folders_to_get. No way to know if they're full until we read the server.
+                folders_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
             else:
                 # this is a file.
                 # check if it is on the disk already.
                 dest_path = os.path.join(local_info_dir, fname)
                 if not os.path.exists(dest_path):
-                    files_to_get.append(urljoin(server_url, fname))
+                    files_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
     return files_to_get, folders_to_get
     
 def foxsi4_download_required(replace_existing=False, verbose=False):
@@ -198,7 +198,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     req = load_response_context()
     server_url = req["remote_server"]
 
-    # for urllib.parse.urljoin to work correctly, server path prefix must end in `/`:
+    # # for urllib.parse.urljoin to work correctly, server path prefix must end in `/`:
     if server_url[-1] != "/":
         server_url += "/"
 
@@ -207,70 +207,54 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     verbose_print("Retrieving response products from:", green_str(server_url))
     verbose_print("Saving response products to:", green_str(local_info_dir))
 
-    # record which files already exist on-disk (don't waste time downloading):
-    existing_files = []
-    for r,_,fs in os.walk(local_info_dir):
-        for f in fs:
-            existing_files.append(os.path.join(r,f))
-
-    desired_files = []      # list of the files to download
-    destination_path = []   # local path to save them to
-    source_name = []        # identifier of the file (YAML key)
-    do_get = []             # flag whether to download (if the file already exists locally)
-
-    for comp_name in req["files"].keys():
-        for f_name, suffix in req["files"][comp_name].items():
-            desired_files.append(urljoin(server_url, suffix))
-            dest = os.path.join(local_info_dir, suffix)
-            destination_path.append(dest)
-            source_name.append(f_name)
-
-            if os.path.exists(dest):
-                do_get.append(False)
-            else:
-                do_get.append(True)
-
+    files_to_get, folders_to_get = foxsi4_list_missing_response_info()
+    
     downloaded = {}
-    if any(do_get):
-        verbose_print("Retrieving files...")
-        for (k, f) in enumerate(tqdm(desired_files, disable=not verbose)):
-
-            if do_get[k]:
-                try:
-                    # create the folders along the save path, if needed
-                    os.makedirs(os.path.dirname(destination_path[k]))
-                except:
-                    pass
-
-                # check if the URL ends in "/" which indicates a folder
-                if f.endswith("/"):
-                    # get the contents of the folder
-                    page = requests.get(f, timeout=5).text
-                    soup = BeautifulSoup(page, 'html.parser')
-                    # make sure we extract all the hrefs then check the link has a "." in it for an extension
-                    linked_files = [node.get('href') for node in soup.find_all('a') if ("." in node.get('href'))]
-                    # just download the folder contents
-                    for link in linked_files:
-                        urllib.request.urlretrieve(f+link, os.path.join(destination_path[k], link))
-                    downloaded[source_name[k]] = f
-                    green_name = f
-                else:
-                    # download the file:
-                    fname, head = urllib.request.urlretrieve(f, destination_path[k])
-                    green_name = os.path.basename(fname)
-                # record the identifier and path of the downloaded file:
-                downloaded[source_name[k]] = fname
-                if verbose:
-                    tqdm.write("Downloaded " + green_str(green_name))
-    else:
+    if not files_to_get and not folders_to_get:
         verbose_print("Found nothing new to download")
+    else:
+        verbose_print("Retrieving files...")
+        for remote_path, local_path in tqdm(files_to_get.items(), disable=not verbose):
+            try:
+                # create the folders along the save path, if needed
+                os.makedirs(os.path.dirname(local_path))
+            except FileExistsError:
+                pass
+                
+            fname, head = urllib.request.urlretrieve(remote_path, local_path)
+            green_name = os.path.basename(fname)
+            # downloaded[source_name[k]] = fname
+            if verbose:
+                tqdm.write("Downloaded " + green_str(green_name))
+        for remote_path, local_path in folders_to_get.items():
+            try:
+                # create the folders along the save path, if needed
+                os.makedirs(os.path.dirname(local_path))
+            except FileExistsError:
+                pass
+                
+            # get the contents of the folder
+            page = requests.get(remote_path, timeout=10).text
+            soup = BeautifulSoup(page, 'html.parser')
+            # make sure we extract all the hrefs then check the link has a "." in it for an extension
+            linked_files = [node.get('href') for node in soup.find_all('a') if ("." in node.get('href'))]
+            # just download the folder contents
+            total_to_get = 0
+            for link in tqdm(linked_files, disable=not verbose):
+                if os.path.exists(os.path.join(local_path, link)):
+                    continue
+                else:
+                    total_to_get += 1
+                    urllib.request.urlretrieve(remote_path+link, os.path.join(local_path, link))
+                    green_name = link
+                    if verbose:
+                        tqdm.write("Downloaded " + green_str(green_name))
+            if total_to_get == 0:
+                verbose_print("Found nothing new to download under", remote_path)
+            # downloaded[source_name[k]] = f
+            # green_name = link
+            
     return downloaded
 
 if __name__ == "__main__":
-    # downloaded = foxsi4_download_required(verbose=True)
-    files,folders = foxsi4_list_missing_response_info() 
-
-    print("files to get:")
-    print(files)
-    print("folders to get:")
-    print(folders)
+    downloaded = foxsi4_download_required(verbose=True)
