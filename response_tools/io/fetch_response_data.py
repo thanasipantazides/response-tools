@@ -234,7 +234,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
                 
             fname, head = urllib.request.urlretrieve(remote_path, local_path)
             green_name = os.path.basename(fname)
-            # downloaded[source_name[k]] = fname
+            downloaded[ftitle] = fname
             if verbose:
                 tqdm.write("Downloaded " + green_str(green_name))
         for ftitle, finfo in folders_to_get.items():
@@ -260,13 +260,14 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
                     total_to_get += 1
                     urllib.request.urlretrieve(remote_path+link, os.path.join(local_path, link))
                     green_name = link
+                    downloaded[ftitle] = link
                     if verbose:
                         tqdm.write("Downloaded " + green_str(green_name))
             if total_to_get == 0:
                 verbose_print("Found nothing new to download under", remote_path)
-            # downloaded[source_name[k]] = f
             
     return downloaded
 
 if __name__ == "__main__":
-    downloaded = foxsi4_download_required(verbose=True)
+    downloaded = foxsi4_download_required(verbose=False)
+    print(downloaded)
