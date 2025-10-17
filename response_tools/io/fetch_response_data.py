@@ -260,14 +260,14 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
                     total_to_get += 1
                     urllib.request.urlretrieve(remote_path+link, os.path.join(local_path, link))
                     green_name = link
-                    downloaded[ftitle] = link
                     if verbose:
                         tqdm.write("Downloaded " + green_str(green_name))
             if total_to_get == 0:
                 verbose_print("Found nothing new to download under", remote_path)
+            else:
+                downloaded[ftitle] = local_path
             
     return downloaded
 
 if __name__ == "__main__":
-    downloaded = foxsi4_download_required(verbose=False)
-    print(downloaded)
+    downloaded = foxsi4_download_required(verbose=True)
