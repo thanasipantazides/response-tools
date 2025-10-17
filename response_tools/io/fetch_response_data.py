@@ -151,13 +151,22 @@ def foxsi4_list_missing_response_info():
             if not ext and path[-1] == '/':
                 # this is a folder.
                 # always add folders to folders_to_get. No way to know if they're full until we read the server.
-                folders_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
+                
+                folders_to_get[ftitle] = {
+                    "remote": urljoin(server_url, fname), 
+                    "local": os.path.join(local_info_dir, fname)
+                }
+                # folders_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
             else:
                 # this is a file.
                 # check if it is on the disk already.
                 dest_path = os.path.join(local_info_dir, fname)
                 if not os.path.exists(dest_path):
-                    files_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
+                    files_to_get[ftitle] = {
+                        "remote": urljoin(server_url, fname),
+                        "local": os.path.join(local_info_dir, fname)
+                    }
+                    # files_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
     return files_to_get, folders_to_get
     
 def foxsi4_download_required(replace_existing=False, verbose=False):
@@ -209,12 +218,14 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
 
     files_to_get, folders_to_get = foxsi4_list_missing_response_info()
     
-    downloaded = {}
+    downloaded = {}   
     if not files_to_get and not folders_to_get:
         verbose_print("Found nothing new to download")
     else:
         verbose_print("Retrieving files...")
-        for remote_path, local_path in tqdm(files_to_get.items(), disable=not verbose):
+        for ftitle, finfo in tqdm(files_to_get.items(), disable=not verbose):
+            remote_path = finfo["remote"]
+            local_path = finfo["local"]
             try:
                 # create the folders along the save path, if needed
                 os.makedirs(os.path.dirname(local_path))
@@ -226,7 +237,9 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
             # downloaded[source_name[k]] = fname
             if verbose:
                 tqdm.write("Downloaded " + green_str(green_name))
-        for remote_path, local_path in folders_to_get.items():
+        for ftitle, finfo in folders_to_get.items():
+            remote_path = finfo["remote"]
+            local_path = finfo["local"]
             try:
                 # create the folders along the save path, if needed
                 os.makedirs(os.path.dirname(local_path))
@@ -252,7 +265,6 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
             if total_to_get == 0:
                 verbose_print("Found nothing new to download under", remote_path)
             # downloaded[source_name[k]] = f
-            # green_name = link
             
     return downloaded
 
