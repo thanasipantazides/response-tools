@@ -130,21 +130,34 @@ class DownloadPrompt:
 def green_str(text:str):
     return "\033[92m" + text + "\033[0m"
         
-def foxsi4_list_missing_response_info():
+def foxsi4_list_missing_response_info(overwrite_all=False, overwrite_old=False):
     """Check which response files need downloading, according to 
     ``response-information/info.yaml``.
     
     Look at all the required files in ``info.yaml``, and see which of them are not 
     already on the local disk.
     
-    .. note:: Folders will always be flagged for download.
-        Some response products are just identified by their folder on the server. 
-        There's no knowing if their contents are already downloaded until we go talk to 
-        the server (which this function does not do).
+    .. note:: Folders will only be flagged for download if they do not exist on disk.
+        A folder may be missing some of the needed response files, but this function will
+        not be aware! If you suspect you are missing some data (due to an interrupted 
+        download, corruption, etc.), set the ``overwrite_all`` flag to ``True`` to pull
+        in all fresh data.
+        
+    Parameters
+    ----------
+    overwrite_all : ``bool``
+        Whether to just download all required files, regardless of whether they appear
+        on the local disk or not. Use this flag if you are suspicious of the response
+        files you have on your computer.
+        
+    overwrite_old : ``bool``
+        Whether to replace old local files with newer versions, if new versions are 
+        available. Currently throws ``NotImplementedError``.
     
     Returns
     -------
-    A tuple describing two items: ``files_to_get`` and ``folders_to_get``.
+    A tuple describing two items: ``files_to_get`` and ``folders_to_get``. These are 
+    intended to be used by ``foxsi4_download_required()`` to actually do the downloading.
     
     ``files_to_get`` is a ``dict`` of each file that should be downloaded from the remote server. The keys in this dictionary are the file names from the ``info.yaml`` file. The value for that key is another ``dict``, which contains the remote server path to the file (under the "remote" key) and the local disk path to save the file (under the "local" key). Like this:
     
@@ -164,6 +177,10 @@ def foxsi4_list_missing_response_info():
                 "local":  "response-tools/response_tools/response-information/attenuation-data/a_response_folder/"
             }
     """
+    
+    if overwrite_old:
+        raise NotImplementedError("No support yet for replacement of old file versions.")
+        
     req = load_response_context()
     server_url = req["remote_server"]
     # for urllib.parse.urljoin to work correctly, server path prefix must end in `/`:
@@ -172,31 +189,27 @@ def foxsi4_list_missing_response_info():
     local_info_dir = os.path.abspath(responseFilePath)
     files_to_get = {}
     folders_to_get = {}
-    for comp_name in req["files"].keys():
-        for ftitle, fname in req["files"][comp_name].items():
+    for comp_name in req["files"].keys(): # all response categories in info.yaml
+        for ftitle, fname in req["files"][comp_name].items(): # all file titles and paths
             path,ext = os.path.splitext(fname)
-            if not ext and path[-1] == '/':
-                # this is a folder.
-                # always add folders to folders_to_get. No way to know if they're full until we read the server.
-                
-                folders_to_get[ftitle] = {
-                    "remote": urljoin(server_url, fname), 
-                    "local": os.path.join(local_info_dir, fname)
-                }
-                # folders_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
-            else:
-                # this is a file.
-                # check if it is on the disk already.
-                dest_path = os.path.join(local_info_dir, fname)
-                if not os.path.exists(dest_path):
+            dest_path = os.path.join(local_info_dir, fname)
+            if not os.path.exists(dest_path) or overwrite_all:
+                # If we don't have this path locally, better add it to the download list.
+                if not ext and path[-1] == '/':
+                    # This is a folder. Add to the folder download list
+                    folders_to_get[ftitle] = {
+                        "remote": urljoin(server_url, fname), 
+                        "local": dest_path
+                    }
+                else:
+                    # This is a file. Add to the files download list.
                     files_to_get[ftitle] = {
                         "remote": urljoin(server_url, fname),
-                        "local": os.path.join(local_info_dir, fname)
+                        "local": dest_path 
                     }
-                    # files_to_get[urljoin(server_url, fname)] = os.path.join(local_info_dir, fname)
     return files_to_get, folders_to_get
     
-def foxsi4_download_required(replace_existing=False, verbose=False):
+def foxsi4_download_required(overwrite_all=False, overwrite_old=False, verbose=False):
     """Download all response component files specified in ``response-information/info.yaml``.
 
         Download data products from a remote server to the local filesystem. Retrieves 
@@ -206,9 +219,14 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
 
         Parameters
         ----------
-        replace_existing : ``bool``
-            Whether to replace local files with newer versions, if newer versions are
-            downloaded. Currently throws ``NotImplementedError``.
+        overwrite_all : ``bool``
+            Whether to just download all required files, regardless of whether they appear
+            on the local disk or not. Use this flag if you are suspicious of the response
+            files you have on your computer.
+            
+        overwrite_old : ``bool``
+            Whether to replace old local files with newer versions, if new versions are 
+            available. Currently throws ``NotImplementedError``.
 
         verbose : ``bool``
             Toggle for printing verbosely. If ``True``, download progress indicators and
@@ -223,7 +241,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
             downloaded) are not included in the return value.
     """
 
-    if replace_existing == True:
+    if overwrite_old:
         raise NotImplementedError("No support yet for replacement of old file versions.")
 
 
@@ -243,7 +261,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     verbose_print("Retrieving response products from:", green_str(server_url))
     verbose_print("Saving response products to:", green_str(local_info_dir))
 
-    files_to_get, folders_to_get = foxsi4_list_missing_response_info()
+    files_to_get, folders_to_get = foxsi4_list_missing_response_info(overwrite_all=overwrite_all, overwrite_old=overwrite_old)
     
     downloaded:dict = {}   
     if not files_to_get and not folders_to_get:
@@ -281,7 +299,7 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
             # just download the folder contents
             total_to_get = 0
             for link in tqdm(linked_files, disable=not verbose):
-                if os.path.exists(os.path.join(local_path, link)):
+                if os.path.exists(os.path.join(local_path, link)) and not overwrite_all:
                     continue
                 else:
                     total_to_get += 1
@@ -297,4 +315,4 @@ def foxsi4_download_required(replace_existing=False, verbose=False):
     return downloaded
 
 if __name__ == "__main__":
-    downloaded = foxsi4_download_required(verbose=True)
+    downloaded = foxsi4_download_required(overwrite_all=False, overwrite_old=False, verbose=True)
