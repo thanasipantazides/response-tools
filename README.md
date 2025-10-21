@@ -8,7 +8,7 @@ Repository to manage response elements, originally for the FOXSI-4 sounding rock
 
 ### Documentation
 
-Documentation can be found in the [Response Tools Data Guide](./Response-Tools-Data-Guide-v1.pdf) and in the [online documentation](https://foxsi.github.io/response-tools/index.html). 
+Documentation can be found in the [Response Tools Data Guide](./Response-Tools-Data-Guide-v1.pdf) and more so in the [online documentation](https://foxsi.github.io/response-tools/index.html). 
 
 ## `response-tools`
 

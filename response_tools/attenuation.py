@@ -420,7 +420,7 @@ def att_cmos_collimator_ratio(off_axis_angle, telescope=None, file=None):
                      model=True,
                      )
 
-@u.quantity_input(mid_energies=u.keV, time=u.second)
+@u.quantity_input(mid_energies=u.keV, time_range=u.second)
 def att_foxsi4_atmosphere(mid_energies, time_range=None, file=None):
     """ 
     Atmsopheric attenuation from and for FOXSI-4 flight data.

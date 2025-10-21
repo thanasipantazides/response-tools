@@ -1,7 +1,11 @@
 # caches
 .DS_Store
 __pycache__/
+
+# docs
 _build/
+docs/auto_examples/
+docs/sg_execution_times.rst
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -9,6 +13,7 @@ _build/
 # Python
 response_tools.egg-info/
 build/
+.eggs/
 
 # data directories
 response_tools/response-information/attenuation-data/

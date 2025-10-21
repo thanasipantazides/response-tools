@@ -21,4 +21,6 @@ setuptools.setup(
         ],
     packages=setuptools.find_packages(),
     zip_safe=False,
+    setup_requires=['setuptools_scm'],
+    include_package_data=True,
 )
