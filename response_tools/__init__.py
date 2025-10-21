@@ -16,6 +16,9 @@ The base `response_tools` namespace includes:
 `~response_tools.__version__`
     The current version of the code as stated in the setup script.
 
+`~response_tools._missing_files`
+    A tuple of the missing files found in initial package import.
+
 Examples
 --------
 # importing the module is as easy as:
@@ -58,7 +61,7 @@ try:
         logging.warning(">>> fetch.foxsi4_download_required(verbose=True)")
         logging.warning("An `overwrite_all` input exists which may be useful.")
         logging.warning("")
-        logging.warning("Consider referrring to the online documentation for more information:")
+        logging.warning("Consider referring to the online documentation for more information:")
         logging.warning("[URL] https://foxsi.github.io/response-tools/general_instructions.html#getting-the-response-files")
         logging.warning("[URL] https://foxsi.github.io/response-tools/response_tools.io.html")
 except Exception as e:
