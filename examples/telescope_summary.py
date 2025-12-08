@@ -65,8 +65,9 @@ def behemoth_plot():
         ["BLANK",                   "BLANK",                "BLANK",                "p3_pixelated_attenuator",  "BLANK",                "p5_pixelated_attenuator",  "BLANK",                "r3_annotate"],
         ["p0_obf",                  "p1_obf",               "p2_uniform_al",        "p3_al_mylar",              "p4_uniform_al",        "p5_al_mylar",              "p6_al_mylar",          "r4_annotate"],
         ["p0_detector_response",    "p1_detector_response", "p2_detector_response", "p3_detector_response",     "p4_detector_response", "p5_detector_response",     "p6_detector_response", "r5_annotate"],
-        ["p0_annotate",             "p1_annotate",          "p2_annotate",          "p3_annotate",              "p4_annotate",          "p5_annotate",              "p6_annotate",          "corner"],
+        ["p0_annotate",             "p1_annotate",          "p2_annotate",          "p3_annotate",              "p4_annotate",          "p5_annotate",              "p6_annotate",          "corner_annotate"],
     ])
+    ylabels = ["Transmission [-]", "Transmission [-]", "Effective area [cm^2]", "Transmission [-]", "Transmission [-]", "Counts [???]", ""]
 
     fig, ax = mpl.pyplot.subplot_mosaic(mosaic, figsize=(12,8), empty_sentinel=blank_sentinel, width_ratios=[2, 2, 2, 2, 2, 2, 2, 1], height_ratios=[2, 2, 2, 2, 2, 2, 1])
 
@@ -86,7 +87,8 @@ def behemoth_plot():
             except Exception:
                 print("no transmissions!")
             try:
-                ax[p].plot(mid_energies, r.contents['effective_areas'], color='black')
+                ax[p].semilogy(mid_energies, r.contents['effective_areas'], color='black')
+                ax[p].set_ylim([0.1, 30])
                 continue
             except Exception:
                 print("no ea!")
@@ -118,18 +120,64 @@ def behemoth_plot():
     for col in mosaic.T:
         first_nonblank = np.argmax(col != blank_sentinel)
         for k,p in enumerate(col):
-            if (k == 0): continue
+            if (k == 0 and p != blank_sentinel):
+                ax[p].tick_params(
+                    axis='x',
+                    which='both',
+                    bottom=False,
+                    top=False,
+                    labeltop=False,
+                    labelbottom=False
+                )
+                continue
             if p == blank_sentinel: continue
             print(first_nonblank, p)
             ax[p].sharex(ax[col[first_nonblank]])
-    for row in mosaic:
+            if (k != len(col) - 2):
+                ax[p].tick_params(
+                    axis='x',
+                    which='both',
+                    bottom=False,
+                    top=False,
+                    labeltop=False,
+                    labelbottom=False
+                )
+            else:
+                ax[p].set_xlabel("Energy [keV]")
+    for i,row in enumerate(mosaic):
         first_nonblank = np.argmax(row != blank_sentinel)
+        print(i)
         for k,p in enumerate(row):
-            if (k == 0): continue
+            if (k == 0 and p != blank_sentinel):
+                ax[p].set_ylabel(ylabels[i])
+                ax[p].yaxis.set_label_coords(-0.5, 0.5)
+                continue
             if p == blank_sentinel: continue
-            print(first_nonblank, p)
             ax[p].sharey(ax[row[first_nonblank]])
-            
+            if (k != first_nonblank):
+                ax[p].tick_params(
+                    axis='y',
+                    which='both',
+                    left=False,
+                    right=False,
+                    labelleft=False,
+                    labelright=False
+                )
+            else:
+                ax[p].set_ylabel(ylabels[i])
+                ax[p].yaxis.set_label_coords(-0.5, 0.5)
+    for i,row in enumerate(mosaic):
+        for k,p in enumerate(row):
+            if 'annotate' in p:
+                # ax[p].spines[['left', 'right', 'bottom', 'top']].set_visible(False)
+                ax[p].axis('off')
+                if i == len(mosaic) - 1 and k < 7:
+                    ax[p].text(0.5, 0, 'Pos ' + str(k),
+                        horizontalalignment='center',
+                        verticalalignment='center',
+                        transform=ax[p].transAxes,
+                        fontsize=16)
+    fig.subplots_adjust(wspace=0.1, hspace=0.15)
     mpl.pyplot.show()
     
 behemoth_plot()
